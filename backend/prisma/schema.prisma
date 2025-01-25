@@ -38,23 +38,25 @@ model Developer {
   Projects    Project[] @relation("DeveloperProjects")
 }
 
+
 model Project {
   ProjectID           String    @id @default(uuid()) @db.Uuid
   Title               String
   Description         String
   Status              ProjectStatus @default(Planned)
-  ProgressPercentage  Int    @default(0) @db.Check("ProgressPercentage BETWEEN 0 AND 100")
+  ProgressPercentage  Int    @default(0)
   EligibilityCriteria Json
   MinCreditScore     Int
   InterestRate       Float
-  DeveloperID        String
-  StartDate          DateTime?  // The start date is optional; add `?` if you want it to be nullable
+  DeveloperID        String  @db.Uuid  // Ensure this is uuid
+  StartDate          DateTime? 
   CreatedAt          DateTime  @default(now())
   Developer          Developer @relation("DeveloperProjects", fields: [DeveloperID], references: [DeveloperID])
   Feedbacks          Feedback[] @relation("ProjectFeedbacks")
   Mortgages          Mortgage[] @relation("ProjectMortgages")
   GIS_Locations      GISLocation[]
 }
+
 
 
 enum ProjectStatus {
@@ -65,27 +67,28 @@ enum ProjectStatus {
 
 model GISLocation {
   GISID      String  @id @default(uuid()) @db.Uuid
-  ProjectID  String
+  ProjectID  String  @db.Uuid  // Ensure this is uuid
   Latitude   Float
   Longitude  Float
   Project    Project @relation(fields: [ProjectID], references: [ProjectID])
 }
 
+
 model Feedback {
   FeedbackID    String   @id @default(uuid()) @db.Uuid
-  UserID        String
-  ProjectID     String
+  UserID        String   @db.Uuid
+  ProjectID     String   @db.Uuid
   Comments      String
-  Rating        Int      @db.Check("Rating BETWEEN 1 AND 5")
+  Rating        Int      // Removed the @db.Check directive
   DateSubmitted DateTime @default(now())
   User          User     @relation("UserFeedbacks", fields: [UserID], references: [UserID])
   Project       Project  @relation("ProjectFeedbacks", fields: [ProjectID], references: [ProjectID])
 }
 
+
 model Mortgage {
   MortgageID    String   @id @default(uuid()) @db.Uuid
-  UserID        String
-  ProjectID     String  // Add this line
+  UserID        String   @db.Uuid
   Income        Float
   LoanAmount    Float
   InterestRate  Float
@@ -98,5 +101,7 @@ model Mortgage {
   Notes         String?
   CalculatedAt  DateTime @default(now())
   User          User     @relation("UserMortgages", fields: [UserID], references: [UserID])
-  Project       Project  @relation("ProjectMortgages", fields: [ProjectID], references: [ProjectID])  // Add this relation
+  ProjectID     String   @db.Uuid  // Add this field to reference the Project
+  Project       Project  @relation("ProjectMortgages", fields: [ProjectID], references: [ProjectID]) // Reverse relation
 }
+
