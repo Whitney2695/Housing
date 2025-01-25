@@ -20,8 +20,8 @@ model User {
   Password  String
   Role      UserRole   @default(user)
   CreatedAt DateTime   @default(now())
-  Feedbacks Feedback[]  @relation("UserFeedbacks")
-  Mortgages Mortgage[]  @relation("UserMortgages")
+  Feedbacks Feedback[] @relation("UserFeedbacks")
+  Mortgages Mortgage[] @relation("UserMortgages")
 }
 
 enum UserRole {
@@ -32,32 +32,29 @@ enum UserRole {
 }
 
 model Developer {
-  DeveloperID String  @id @default(uuid()) @db.Uuid
+  DeveloperID String    @id @default(uuid()) @db.Uuid
   Name        String
   ContactInfo String
   Projects    Project[] @relation("DeveloperProjects")
 }
 
-
 model Project {
-  ProjectID           String    @id @default(uuid()) @db.Uuid
+  ProjectID           String        @id @default(uuid()) @db.Uuid
   Title               String
   Description         String
   Status              ProjectStatus @default(Planned)
-  ProgressPercentage  Int    @default(0)
+  ProgressPercentage  Int           @default(0)
   EligibilityCriteria Json
-  MinCreditScore     Int
-  InterestRate       Float
-  DeveloperID        String  @db.Uuid  // Ensure this is uuid
-  StartDate          DateTime? 
-  CreatedAt          DateTime  @default(now())
-  Developer          Developer @relation("DeveloperProjects", fields: [DeveloperID], references: [DeveloperID])
-  Feedbacks          Feedback[] @relation("ProjectFeedbacks")
-  Mortgages          Mortgage[] @relation("ProjectMortgages")
-  GIS_Locations      GISLocation[]
+  MinCreditScore      Int
+  InterestRate        Float
+  DeveloperID         String        @db.Uuid // Ensure this is uuid
+  StartDate           DateTime?
+  CreatedAt           DateTime      @default(now())
+  Developer           Developer     @relation("DeveloperProjects", fields: [DeveloperID], references: [DeveloperID])
+  Feedbacks           Feedback[]    @relation("ProjectFeedbacks")
+  Mortgages           Mortgage[]    @relation("ProjectMortgages")
+  GIS_Locations       GISLocation[]
 }
-
-
 
 enum ProjectStatus {
   Planned
@@ -66,42 +63,40 @@ enum ProjectStatus {
 }
 
 model GISLocation {
-  GISID      String  @id @default(uuid()) @db.Uuid
-  ProjectID  String  @db.Uuid  // Ensure this is uuid
-  Latitude   Float
-  Longitude  Float
-  Project    Project @relation(fields: [ProjectID], references: [ProjectID])
+  GISID     String  @id @default(uuid()) @db.Uuid
+  ProjectID String  @db.Uuid // Ensure this is uuid
+  Latitude  Float
+  Longitude Float
+  Project   Project @relation(fields: [ProjectID], references: [ProjectID])
 }
-
 
 model Feedback {
   FeedbackID    String   @id @default(uuid()) @db.Uuid
   UserID        String   @db.Uuid
   ProjectID     String   @db.Uuid
   Comments      String
-  Rating        Int      // Removed the @db.Check directive
+  Rating        Int // Removed the @db.Check directive
   DateSubmitted DateTime @default(now())
   User          User     @relation("UserFeedbacks", fields: [UserID], references: [UserID])
   Project       Project  @relation("ProjectFeedbacks", fields: [ProjectID], references: [ProjectID])
 }
 
-
 model Mortgage {
-  MortgageID    String   @id @default(uuid()) @db.Uuid
-  UserID        String   @db.Uuid
-  Income        Float
-  LoanAmount    Float
-  InterestRate  Float
-  LoanTermYears Int
+  MortgageID     String   @id @default(uuid()) @db.Uuid
+  UserID         String   @db.Uuid // Ensure this is @db.Uuid
+  Income         Float
+  LoanAmount     Float
+  InterestRate   Float
+  LoanTermYears  Int
   MonthlyPayment Float?
   TotalPayment   Float?
   TotalInterest  Float?
-  CreditScore   Int
-  IsEligible    Boolean  @default(false)
-  Notes         String?
-  CalculatedAt  DateTime @default(now())
-  User          User     @relation("UserMortgages", fields: [UserID], references: [UserID])
-  ProjectID     String   @db.Uuid  // Add this field to reference the Project
-  Project       Project  @relation("ProjectMortgages", fields: [ProjectID], references: [ProjectID]) // Reverse relation
-}
+  CreditScore    Int
+  IsEligible     Boolean  @default(false)
+  Notes          String?
+  CalculatedAt   DateTime @default(now())
+  User           User     @relation("UserMortgages", fields: [UserID], references: [UserID])
 
+  projectId String?  @db.Uuid
+  project   Project? @relation("ProjectMortgages", fields: [projectId], references: [ProjectID]) // Change references to 'ProjectID'
+}
