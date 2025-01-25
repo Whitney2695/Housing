@@ -12,3 +12,91 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model User {
+  UserID    String     @id @default(uuid()) @db.Uuid
+  Name      String
+  Email     String     @unique
+  Password  String
+  Role      UserRole   @default(user)
+  CreatedAt DateTime   @default(now())
+  Feedbacks Feedback[]  @relation("UserFeedbacks")
+  Mortgages Mortgage[]  @relation("UserMortgages")
+}
+
+enum UserRole {
+  user
+  admin
+  developer
+  government_official
+}
+
+model Developer {
+  DeveloperID String  @id @default(uuid()) @db.Uuid
+  Name        String
+  ContactInfo String
+  Projects    Project[] @relation("DeveloperProjects")
+}
+
+model Project {
+  ProjectID           String    @id @default(uuid()) @db.Uuid
+  Title               String
+  Description         String
+  Status              ProjectStatus @default(Planned)
+  ProgressPercentage  Int    @default(0) @db.Check("ProgressPercentage BETWEEN 0 AND 100")
+  EligibilityCriteria Json
+  MinCreditScore     Int
+  InterestRate       Float
+  DeveloperID        String
+  StartDate          DateTime?  // The start date is optional; add `?` if you want it to be nullable
+  CreatedAt          DateTime  @default(now())
+  Developer          Developer @relation("DeveloperProjects", fields: [DeveloperID], references: [DeveloperID])
+  Feedbacks          Feedback[] @relation("ProjectFeedbacks")
+  Mortgages          Mortgage[] @relation("ProjectMortgages")
+  GIS_Locations      GISLocation[]
+}
+
+
+enum ProjectStatus {
+  Planned
+  InProgress
+  Completed
+}
+
+model GISLocation {
+  GISID      String  @id @default(uuid()) @db.Uuid
+  ProjectID  String
+  Latitude   Float
+  Longitude  Float
+  Project    Project @relation(fields: [ProjectID], references: [ProjectID])
+}
+
+model Feedback {
+  FeedbackID    String   @id @default(uuid()) @db.Uuid
+  UserID        String
+  ProjectID     String
+  Comments      String
+  Rating        Int      @db.Check("Rating BETWEEN 1 AND 5")
+  DateSubmitted DateTime @default(now())
+  User          User     @relation("UserFeedbacks", fields: [UserID], references: [UserID])
+  Project       Project  @relation("ProjectFeedbacks", fields: [ProjectID], references: [ProjectID])
+}
+
+model Mortgage {
+  MortgageID    String   @id @default(uuid()) @db.Uuid
+  UserID        String
+  ProjectID     String  // Add this line
+  Income        Float
+  LoanAmount    Float
+  InterestRate  Float
+  LoanTermYears Int
+  MonthlyPayment Float?
+  TotalPayment   Float?
+  TotalInterest  Float?
+  CreditScore   Int
+  IsEligible    Boolean  @default(false)
+  Notes         String?
+  CalculatedAt  DateTime @default(now())
+  User          User     @relation("UserMortgages", fields: [UserID], references: [UserID])
+  Project       Project  @relation("ProjectMortgages", fields: [ProjectID], references: [ProjectID])  // Add this relation
+}
