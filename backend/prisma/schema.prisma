@@ -22,6 +22,8 @@ model User {
   CreatedAt DateTime   @default(now())
   Feedbacks Feedback[] @relation("UserFeedbacks")
   Mortgages Mortgage[] @relation("UserMortgages")
+  ResetCode         String?  // Add this line
+  ResetCodeExpiry   DateTime? // Add this line
 }
 
 enum UserRole {
