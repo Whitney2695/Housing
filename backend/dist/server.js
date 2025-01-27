@@ -8,21 +8,33 @@ const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const client_1 = require("@prisma/client");
 const userRoutes_1 = __importDefault(require("./Routes/userRoutes"));
+const path_1 = __importDefault(require("path"));
+const http_1 = __importDefault(require("http"));
 const app = (0, express_1.default)();
 exports.prisma = new client_1.PrismaClient();
+// CORS options
 const corsOptions = {
-    origin: 'http://localhost:4200',
+    origin: 'http://localhost:4200', // Angular frontend URL
     credentials: true,
 };
 app.use(express_1.default.json());
 app.use((0, cors_1.default)(corsOptions));
 // Use the user routes
 app.use('/api/users', userRoutes_1.default);
-// Define a simple home route (optional)
+// Home route for the API
 app.get('/', (req, res) => {
     res.send('Welcome to the API');
 });
-const PORT = 3000;
-app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}...`);
+// Serve static images from a separate folder
+const imageApp = (0, express_1.default)();
+imageApp.use('/images', express_1.default.static(path_1.default.join(__dirname, 'images')));
+// Set up server for images to listen on port 4000
+const imageServer = http_1.default.createServer(imageApp);
+imageServer.listen(5000, () => {
+    console.log('Image server running on http://localhost:5000');
+});
+// Your main API server listens on port 3000
+const apiPort = 3000;
+app.listen(apiPort, () => {
+    console.log(`API server running on http://localhost:${apiPort}`);
 });

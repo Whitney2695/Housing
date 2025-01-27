@@ -6,11 +6,18 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const userController_1 = __importDefault(require("../controller/userController"));
 const router = (0, express_1.Router)();
+const usersController = new userController_1.default();
+// Helper function to wrap async methods and handle errors
+const asyncHandler = (fn) => (req, res, next) => {
+    fn(req, res, next).catch(next);
+};
 // Define user routes
-router.post('/register', userController_1.default.createUser);
-router.get('/:userID', userController_1.default.getUserById);
-router.get('/', userController_1.default.getAllUsers);
-router.put('/:userID/reset-password', userController_1.default.resetPassword);
-router.put('/:userID', userController_1.default.updateUser);
-router.delete('/:userID', userController_1.default.deleteUser);
+router.post('/register', asyncHandler(usersController.createUser));
+router.get('/:userID', asyncHandler(usersController.getUserById));
+router.get('/', asyncHandler(usersController.getAllUsers));
+router.post('/request-reset-code', asyncHandler(usersController.requestResetCode));
+router.put('/reset-password', asyncHandler(usersController.resetPassword));
+router.put('/:userID/reset-password', asyncHandler(usersController.resetPassword));
+router.put('/:userID', asyncHandler(usersController.updateUser));
+router.delete('/:userID', asyncHandler(usersController.deleteUser));
 exports.default = router;

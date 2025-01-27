@@ -24,10 +24,13 @@ class UsersService {
     constructor() {
         this.brevoApiKey = process.env.BREVO_API_KEY; // Ensure this is set in your .env file
         this.brevoSenderEmail = process.env.BREVO_SENDER_EMAIL; // Sender email for Brevo
+        this.companyName = 'Haven Builders'; // Company name for email customization
+        this.logoUrl = 'http://localhost:5000/images/house.jpg';
     }
+    // Create a new user
     createUser(name_1, email_1, password_1) {
         return __awaiter(this, arguments, void 0, function* (name, email, password, role = client_1.UserRole.user) {
-            console.log('Starting user creation process'); // Log the start of the process
+            console.log('Starting user creation process');
             const hashedPassword = yield bcryptjs_1.default.hash(password, 10);
             console.log(`Hashed password for ${email}`);
             const user = yield prisma.user.create({
@@ -38,14 +41,21 @@ class UsersService {
                     Role: role,
                 },
             });
-            console.log(`User created successfully: ${user.Email}`); // Log successful creation
-            // Send email after successful registration
+            console.log(`User created successfully: ${user.Email}`);
+            // Send registration email
             console.log(`Sending registration email to ${email}`);
-            yield this.sendEmail(email, 'Registration Successful', `Hello ${name},\n\nYou have successfully registered!`);
-            console.log('Registration email sent'); // Log email sent status
+            yield this.sendEmail(email, 'Welcome to YourCompany!', `<div style="font-family: Arial, sans-serif; line-height: 1.6; padding: 20px; background-color: #f4f4f4; text-align: center; width: 100%; max-width: 600px; margin: 0 auto; border-radius: 8px;">
+        <img src="${this.logoUrl}" alt="Logo" style="width: 150px; margin-bottom: 20px;">
+        <h2 style="color: #2a9d8f;">Hello ${name},</h2>
+        <p style="color: #555;">You have successfully registered with <strong>${this.companyName}</strong>.</p>
+        <p style="color: #555;">We are excited to have you onboard!</p>
+        <p style="color: #555;">Best regards,<br /><strong>${this.companyName} Team</strong></p>
+      </div>`);
+            console.log('Registration email sent');
             return user;
         });
     }
+    // Send an email using Brevo
     sendEmail(to, subject, content) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a, _b;
@@ -54,7 +64,7 @@ class UsersService {
                     sender: { email: this.brevoSenderEmail },
                     to: [{ email: to }],
                     subject: subject,
-                    htmlContent: `<p>${content.replace(/\n/g, '<br>')}</p>`,
+                    htmlContent: content,
                 }, {
                     headers: {
                         'api-key': this.brevoApiKey,
@@ -64,7 +74,6 @@ class UsersService {
                 console.log(`Email sent successfully: ${response.status}`);
             }
             catch (error) {
-                // General error handling
                 const errorMessage = ((_b = (_a = error.response) === null || _a === void 0 ? void 0 : _a.data) === null || _b === void 0 ? void 0 : _b.message) || error.message || 'Unknown error occurred';
                 console.error('Failed to send email:', errorMessage);
                 throw new Error(`Email sending failed: ${errorMessage}`);
@@ -161,7 +170,14 @@ class UsersService {
             });
             // Send email with the reset code
             console.log(`Sending reset code to ${email}`);
-            yield this.sendEmail(email, 'Password Reset Code', `Your password reset code is: ${resetCode}`);
+            yield this.sendEmail(email, 'Password Reset Code', `<div style="font-family: Arial, sans-serif; line-height: 1.6; padding: 20px; background-color: #f4f4f4; text-align: center; width: 100%; max-width: 600px; margin: 0 auto; border-radius: 8px;">
+        <img src="${this.logoUrl}" alt="Logo" style="width: 150px; margin-bottom: 20px;">
+        <h2 style="color: #e76f51;">Password Reset Code</h2>
+        <p style="color: #555;">We received a request to reset your password.</p>
+        <p style="color: #555;">Your password reset code is: <strong>${resetCode}</strong></p>
+        <p style="color: #555;">The code will expire in 15 minutes. If you didn't request this, please ignore this email.</p>
+        <p style="color: #555;">Best regards,<br /><strong>${this.companyName} Team</strong></p>
+      </div>`);
             console.log('Password reset email sent');
             return resetCode;
         });
@@ -194,7 +210,13 @@ class UsersService {
             });
             // Send success email after password reset
             console.log(`Sending password reset confirmation email to ${email}`);
-            yield this.sendEmail(email, 'Password Reset Successful', `Your password has been successfully updated.`);
+            yield this.sendEmail(email, 'Password Reset Successful', `<div style="font-family: Arial, sans-serif; line-height: 1.6; padding: 20px; background-color: #f4f4f4; text-align: center; width: 100%; max-width: 600px; margin: 0 auto; border-radius: 8px;">
+        <img src="${this.logoUrl}" alt="Logo" style="width: 150px; margin-bottom: 20px;">
+        <h2 style="color: #2a9d8f;">Password Reset Successful</h2>
+        <p style="color: #555;">Your password has been successfully updated.</p>
+        <p style="color: #555;">If you didn't make this change, please contact support immediately.</p>
+        <p style="color: #555;">Best regards,<br /><strong>${this.companyName} Team</strong></p>
+      </div>`);
             console.log('Password reset confirmation email sent');
             return updatedUser;
         });

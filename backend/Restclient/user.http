@@ -3,8 +3,8 @@ POST http://localhost:3000/api/users/register
 Content-Type: application/json
 
 {
-    "name": "Whitney Navala",
-    "email": "whitneyjacks685@gmail.com",
+    "name": "Whitney Navalia",
+    "email": "wn.whitneynavalia@gmail.com",
     "password": "password123"
 }
 
@@ -14,27 +14,38 @@ Content-Type: application/json
 
 
 ### Get user by ID (Whitney Navalia)
-GET http://localhost:3000/api/users/238015a3-a21c-4f50-9505-6ed3b7e71d6f
+GET http://localhost:3000/api/users/6a3961ea-1110-4c85-91b4-1e359af0e665
 Content-Type: application/json
 
 ### Update user details (Whitney Navalia)
-PUT http://localhost:3000/api/users/238015a3-a21c-4f50-9505-6ed3b7e71d6f
+PUT http://localhost:3000/api/users/6a3961ea-1110-4c85-91b4-1e359af0e665
 Content-Type: application/json
 
 {
     "name": "Whitney Navalia Updated",
-    "email": "whitney.updated@example.com",
+    "email": "whitney@ex.com",
     "role": "admin"
 }
 
-### Reset user password (Whitney Navalia)
-PUT http://localhost:3000/api/users/171467d8-7483-4174-ab62-6beea562702a/reset-password
+###generate code
+POST http://localhost:3000/api/users/request-reset-code
 Content-Type: application/json
 
 {
-    "newPassword": "newpassword123"
+  "email": "whitneyjacks685@gmail.com"
+}
+
+
+### Reset user password (Whitney Navalia)
+PUT http://localhost:3000/api/users/reset-password
+Content-Type: application/json
+
+{
+  "email": "whitneyjacks685@gmail.com",
+  "resetCode": "e5f4ac",
+  "newPassword": "newpassword23"
 }
 
 ### Delete user (Whitney Navalia)
-DELETE http://localhost:3000/api/users/41b2300a-c890-4507-a9fd-fd27edea73b6
+DELETE http://localhost:3000/api/users/7080142d-aac9-443a-b9af-6869b86a1afc
 Content-Type: application/json

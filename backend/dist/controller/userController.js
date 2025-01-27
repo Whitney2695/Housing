@@ -12,103 +12,147 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const userService_1 = __importDefault(require("../services/userService")); // Assuming your service file is named usersService.ts
+const userService_1 = __importDefault(require("../services/userService"));
 const client_1 = require("@prisma/client");
+const uuid_1 = require("uuid");
 const prisma = new client_1.PrismaClient();
 class UsersController {
-    constructor() {
-        // Explicitly specify the return type as Promise<void>
-        this.createUser = (req, res) => __awaiter(this, void 0, void 0, function* () {
+    createUser(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { name, email, password, role } = req.body;
-                // Check if email already exists
                 const existingUser = yield prisma.user.findUnique({
                     where: { Email: email },
                 });
                 if (existingUser) {
-                    // Do not return the response, just call res.status()
-                    res.status(400).json({ message: 'Error: Email already in use' });
-                    return; // End the function here, no need to return the response object
+                    return res.status(400).json({ message: 'Error: Email already in use' });
                 }
-                // Proceed with creating the user
                 const user = yield userService_1.default.createUser(name, email, password, role);
-                res.status(201).json(user); // Send the response without return
+                return res.status(201).json(user);
             }
             catch (error) {
-                res.status(500).json({ message: 'Error creating user', error: error.message });
+                return res.status(500).json({ message: 'Error creating user', error: error.message });
             }
         });
     }
-    // Get user by ID
     getUserById(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { userID } = req.params;
                 const user = yield userService_1.default.getUserById(userID);
                 if (user) {
-                    res.status(200).json(user);
+                    return res.status(200).json(user);
                 }
                 else {
-                    res.status(404).json({ message: 'User not found' });
+                    return res.status(404).json({ message: 'User not found' });
                 }
             }
             catch (error) {
-                res.status(500).json({ message: 'Error fetching user', error: error.message });
+                return res.status(500).json({ message: 'Error fetching user', error: error.message });
             }
         });
     }
-    // Get all users
     getAllUsers(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const users = yield userService_1.default.getAllUsers();
-                res.status(200).json(users);
+                return res.status(200).json(users);
             }
             catch (error) {
-                res.status(500).json({ message: 'Error fetching users', error: error.message });
+                return res.status(500).json({ message: 'Error fetching users', error: error.message });
             }
         });
     }
-    // Reset user password (steps to generate, verify, and set new password)
     resetPassword(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const { userID } = req.params;
-                const { newPassword } = req.body;
-                const updatedUser = yield userService_1.default.resetPassword(userID, newPassword);
-                res.status(200).json(updatedUser);
+                const { email, newPassword, resetCode } = req.body;
+                if (!email || !resetCode || !newPassword) {
+                    return res.status(400).json({ message: 'Missing email, reset code, or new password' });
+                }
+                // Verify reset code
+                const codeVerified = yield userService_1.default.verifyResetCode(email, resetCode);
+                if (!codeVerified) {
+                    return res.status(400).json({ message: 'Invalid or expired reset code' });
+                }
+                // Update the user's password
+                const updatedUser = yield userService_1.default.setNewPassword(email, newPassword);
+                return res.status(200).json(updatedUser);
             }
             catch (error) {
-                res.status(500).json({ message: 'Error resetting password', error: error.message });
+                return res.status(500).json({ message: 'Error resetting password', error: error.message });
             }
         });
     }
-    // Update user details (excluding password)
+    requestResetCode(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { email } = req.body;
+                if (!email) {
+                    return res.status(400).json({ message: 'Email is required' });
+                }
+                // Generate reset code and send it to the email
+                yield userService_1.default.generateResetCode(email);
+                return res.status(200).json({ message: 'Reset code sent to your email' });
+            }
+            catch (error) {
+                return res.status(500).json({ message: 'Error generating reset code', error: error.message });
+            }
+        });
+    }
+    resetPasswordWithCode(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { email, resetCode, newPassword } = req.body;
+                if (!email || !resetCode || !newPassword) {
+                    return res.status(400).json({ message: 'Missing email, reset code, or new password' });
+                }
+                // Verify reset code
+                const isValidCode = yield userService_1.default.verifyResetCode(email, resetCode);
+                if (!isValidCode) {
+                    return res.status(400).json({ message: 'Invalid or expired reset code' });
+                }
+                // Set new password
+                const updatedUser = yield userService_1.default.setNewPassword(email, newPassword);
+                return res.status(200).json({ message: 'Password reset successfully', user: updatedUser });
+            }
+            catch (error) {
+                return res.status(500).json({ message: 'Error resetting password', error: error.message });
+            }
+        });
+    }
     updateUser(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { userID } = req.params;
                 const { name, email, role } = req.body;
+                // Validate userID as a valid UUID
+                if (!(0, uuid_1.validate)(userID)) {
+                    return res.status(400).json({ message: 'Invalid user ID format' });
+                }
                 const updatedUser = yield userService_1.default.updateUser(userID, name, email, role);
-                res.status(200).json(updatedUser);
+                return res.status(200).json(updatedUser);
             }
             catch (error) {
-                res.status(500).json({ message: 'Error updating user', error: error.message });
+                return res.status(500).json({ message: 'Error updating user', error: error.message });
             }
         });
     }
-    // Delete user
     deleteUser(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { userID } = req.params;
+                // Validate userID as a valid UUID
+                if (!(0, uuid_1.validate)(userID)) {
+                    return res.status(400).json({ message: 'Invalid user ID format' });
+                }
                 const result = yield userService_1.default.deleteUser(userID);
-                res.status(200).json(result); // Returning the success message
+                return res.status(200).json(result); // Returning the success message
             }
             catch (error) {
-                res.status(500).json({ message: 'Error deleting user', error: error.message });
+                return res.status(500).json({ message: 'Error deleting user', error: error.message });
             }
         });
     }
 }
-exports.default = new UsersController();
+exports.default = UsersController;
