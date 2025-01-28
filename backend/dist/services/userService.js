@@ -44,12 +44,20 @@ class UsersService {
             console.log(`User created successfully: ${user.Email}`);
             // Send registration email
             console.log(`Sending registration email to ${email}`);
-            yield this.sendEmail(email, 'Welcome to YourCompany!', `<div style="font-family: Arial, sans-serif; line-height: 1.6; padding: 20px; background-color: #f4f4f4; text-align: center; width: 100%; max-width: 600px; margin: 0 auto; border-radius: 8px;">
-        <img src="${this.logoUrl}" alt="Logo" style="width: 150px; margin-bottom: 20px;">
-        <h2 style="color: #2a9d8f;">Hello ${name},</h2>
-        <p style="color: #555;">You have successfully registered with <strong>${this.companyName}</strong>.</p>
-        <p style="color: #555;">We are excited to have you onboard!</p>
-        <p style="color: #555;">Best regards,<br /><strong>${this.companyName} Team</strong></p>
+            yield this.sendEmail(email, 'Welcome to HavenHomes!', `<div style="font-family: Arial, sans-serif; line-height: 1.6; padding: 20px; text-align: center; width: 100%; margin: 0px; border-radius: 8px;">
+        <div style="font-size: 2.5rem; font-weight: bold; margin-bottom: 20px;">
+          <span style="color: #e63946;">W</span>
+          <span style="color: #f4a261;">E</span>
+          <span style="color: #2a9d8f;">L</span>
+          <span style="color: #457b9d;">C</span>
+          <span style="color: #1d3557;">O</span>
+          <span style="color: #6a0572;">M</span>
+          <span style="color: #ff9f1c;">E</span>
+        </div>
+        <h2 style="color: #2a9d8f; font-size: 1.8rem;">Hello ${name},</h2>
+        <p style="color: #555; font-size: 1.2rem;">You have successfully registered with <strong>${this.companyName}</strong>.</p>
+        <p style="color: #555; font-size: 1.2rem;">We are excited to have you onboard!</p>
+        <p style="color: #555; font-size: 1.2rem;">Best regards,<br /><strong>${this.companyName} Team</strong></p>
       </div>`);
             console.log('Registration email sent');
             return user;
@@ -170,13 +178,12 @@ class UsersService {
             });
             // Send email with the reset code
             console.log(`Sending reset code to ${email}`);
-            yield this.sendEmail(email, 'Password Reset Code', `<div style="font-family: Arial, sans-serif; line-height: 1.6; padding: 20px; background-color: #f4f4f4; text-align: center; width: 100%; max-width: 600px; margin: 0 auto; border-radius: 8px;">
-        <img src="${this.logoUrl}" alt="Logo" style="width: 150px; margin-bottom: 20px;">
-        <h2 style="color: #e76f51;">Password Reset Code</h2>
-        <p style="color: #555;">We received a request to reset your password.</p>
-        <p style="color: #555;">Your password reset code is: <strong>${resetCode}</strong></p>
-        <p style="color: #555;">The code will expire in 15 minutes. If you didn't request this, please ignore this email.</p>
-        <p style="color: #555;">Best regards,<br /><strong>${this.companyName} Team</strong></p>
+            yield this.sendEmail(email, 'Password Reset Code', `<div style="font-family: Arial, sans-serif; line-height: 1.6; padding: 20px; background-color: #ffffff; text-align: center; width: 100%; max-width: 600px; margin: 0 auto; border-radius: 8px;">
+        <h2 style="color: #e76f51; font-size: 2rem;">Password Reset Code</h2>
+        <p style="color: #555; font-size: 1.2rem;">We received a request to reset your password.</p>
+        <p style="color: #555; font-size: 1.2rem;">Your password reset code is: <strong style="font-size: 1.5rem; color: #333;">${resetCode}</strong></p>
+        <p style="color: #555; font-size: 1.2rem;">The code will expire in 15 minutes. If you didn't request this, please ignore this email.</p>
+        <p style="color: #555; font-size: 1.2rem;">Best regards,<br /><strong>${this.companyName} Team</strong></p>
       </div>`);
             console.log('Password reset email sent');
             return resetCode;
@@ -196,11 +203,12 @@ class UsersService {
         });
     }
     // Step 3: Reset the password
+    // Step 3: Reset the password
     setNewPassword(email, newPassword) {
         return __awaiter(this, void 0, void 0, function* () {
             console.log(`Setting new password for email: ${email}`);
             const hashedPassword = yield bcryptjs_1.default.hash(newPassword, 10);
-            const updatedUser = yield prisma.user.update({
+            yield prisma.user.update({
                 where: { Email: email },
                 data: {
                     Password: hashedPassword,
@@ -210,15 +218,14 @@ class UsersService {
             });
             // Send success email after password reset
             console.log(`Sending password reset confirmation email to ${email}`);
-            yield this.sendEmail(email, 'Password Reset Successful', `<div style="font-family: Arial, sans-serif; line-height: 1.6; padding: 20px; background-color: #f4f4f4; text-align: center; width: 100%; max-width: 600px; margin: 0 auto; border-radius: 8px;">
-        <img src="${this.logoUrl}" alt="Logo" style="width: 150px; margin-bottom: 20px;">
-        <h2 style="color: #2a9d8f;">Password Reset Successful</h2>
-        <p style="color: #555;">Your password has been successfully updated.</p>
-        <p style="color: #555;">If you didn't make this change, please contact support immediately.</p>
-        <p style="color: #555;">Best regards,<br /><strong>${this.companyName} Team</strong></p>
-      </div>`);
+            yield this.sendEmail(email, 'Password Reset Successful', `<div style="font-family: Arial, sans-serif; line-height: 1.6; padding: 20px; background-color: #ffffff; text-align: center; width: 100%; max-width: 600px; margin: 0 auto; border-radius: 8px;">
+    <h2 style="color: #2a9d8f; font-size: 2rem;">Password Reset Successful</h2>
+    <p style="color: #555; font-size: 1.2rem;">Your password has been successfully updated.</p>
+    <p style="color: #555; font-size: 1.2rem;">If you didn't make this change, please contact support immediately.</p>
+    <p style="color: #555; font-size: 1.2rem;">Best regards,<br /><strong>${this.companyName} Team</strong></p>
+  </div>`);
             console.log('Password reset confirmation email sent');
-            return updatedUser;
+            return { message: 'Password reset successfully' }; // Only returning a success message
         });
     }
 }

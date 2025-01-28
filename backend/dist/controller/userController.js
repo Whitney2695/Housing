@@ -100,6 +100,7 @@ class UsersController {
             }
         });
     }
+    // Reset password using code
     resetPasswordWithCode(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -113,8 +114,8 @@ class UsersController {
                     return res.status(400).json({ message: 'Invalid or expired reset code' });
                 }
                 // Set new password
-                const updatedUser = yield userService_1.default.setNewPassword(email, newPassword);
-                return res.status(200).json({ message: 'Password reset successfully', user: updatedUser });
+                const result = yield userService_1.default.setNewPassword(email, newPassword);
+                return res.status(200).json(result); // Responding with a success message
             }
             catch (error) {
                 return res.status(500).json({ message: 'Error resetting password', error: error.message });

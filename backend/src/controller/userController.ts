@@ -83,28 +83,29 @@ class UsersController {
       return res.status(500).json({ message: 'Error generating reset code', error: error.message });
     }
   }
+// Reset password using code
+async resetPasswordWithCode(req: Request, res: Response) {
+  try {
+    const { email, resetCode, newPassword } = req.body;
 
-  async resetPasswordWithCode(req: Request, res: Response) {
-    try {
-      const { email, resetCode, newPassword } = req.body;
-
-      if (!email || !resetCode || !newPassword) {
-        return res.status(400).json({ message: 'Missing email, reset code, or new password' });
-      }
-
-      // Verify reset code
-      const isValidCode = await UsersService.verifyResetCode(email, resetCode);
-      if (!isValidCode) {
-        return res.status(400).json({ message: 'Invalid or expired reset code' });
-      }
-
-      // Set new password
-      const updatedUser = await UsersService.setNewPassword(email, newPassword);
-      return res.status(200).json({ message: 'Password reset successfully', user: updatedUser });
-    } catch (error: any) {
-      return res.status(500).json({ message: 'Error resetting password', error: error.message });
+    if (!email || !resetCode || !newPassword) {
+      return res.status(400).json({ message: 'Missing email, reset code, or new password' });
     }
+
+    // Verify reset code
+    const isValidCode = await UsersService.verifyResetCode(email, resetCode);
+    if (!isValidCode) {
+      return res.status(400).json({ message: 'Invalid or expired reset code' });
+    }
+
+    // Set new password
+    const result = await UsersService.setNewPassword(email, newPassword);
+    return res.status(200).json(result); // Responding with a success message
+  } catch (error: any) {
+    return res.status(500).json({ message: 'Error resetting password', error: error.message });
   }
+}
+
 
   async updateUser(req: Request, res: Response) {
     try {

@@ -3,8 +3,8 @@ POST http://localhost:3000/api/users/register
 Content-Type: application/json
 
 {
-    "name": "Whitney Navalia",
-    "email": "wn.whitneynavalia@gmail.com",
+    "name": "Whitney ",
+    "email": "whitneyjacks685@gmail.com",
     "password": "password123"
 }
 
@@ -14,11 +14,11 @@ Content-Type: application/json
 
 
 ### Get user by ID (Whitney Navalia)
-GET http://localhost:3000/api/users/6a3961ea-1110-4c85-91b4-1e359af0e665
+GET http://localhost:3000/api/users/58aad0f7-3927-4b48-ac37-074151a19ce8
 Content-Type: application/json
 
 ### Update user details (Whitney Navalia)
-PUT http://localhost:3000/api/users/6a3961ea-1110-4c85-91b4-1e359af0e665
+PUT http://localhost:3000/api/users/58aad0f7-3927-4b48-ac37-074151a19ce8
 Content-Type: application/json
 
 {
@@ -42,10 +42,10 @@ Content-Type: application/json
 
 {
   "email": "whitneyjacks685@gmail.com",
-  "resetCode": "e5f4ac",
+  "resetCode": "9fc3b7",
   "newPassword": "newpassword23"
 }
 
 ### Delete user (Whitney Navalia)
-DELETE http://localhost:3000/api/users/7080142d-aac9-443a-b9af-6869b86a1afc
+DELETE http://localhost:3000/api/users/c7d434d9-7797-4535-b155-a30d1689fe75
 Content-Type: application/json

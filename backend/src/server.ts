@@ -29,6 +29,7 @@ app.get('/', (req: Request, res: Response) => {
 const imageApp = express();
 imageApp.use('/images', express.static(path.join(__dirname, 'images')));
 
+
 // Set up server for images to listen on port 4000
 const imageServer = http.createServer(imageApp);
 imageServer.listen(5000, () => {
