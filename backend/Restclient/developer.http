@@ -1,0 +1,26 @@
+### Create Developer
+POST http://localhost:3000/api/developers
+Content-Type: application/json
+
+{
+  "name": "John Doe",
+  "contactInfo": "0789633432"
+}
+
+### Get All Developers
+GET http://localhost:3000/api/developers
+
+### Get Developer by ID
+GET http://localhost:3000/api/developers/{DeveloperID}
+
+### Update Developer
+PUT http://localhost:3000/api/developers/{DeveloperID}
+Content-Type: application/json
+
+{
+  "name": "Jane Doe",
+  "contactInfo": "janedoe@example.com"
+}
+
+### Delete Developer
+DELETE http://localhost:3000/api/developers/{DeveloperID}
