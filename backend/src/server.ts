@@ -2,6 +2,7 @@ import express, { Request, Response } from 'express';
 import cors from 'cors';
 import { PrismaClient } from '@prisma/client';
 import userRoutes from './Routes/userRoutes';
+import authRoutes from './Routes/authRoutes';
 import path from 'path';
 import http from 'http';
 
@@ -19,6 +20,7 @@ app.use(cors(corsOptions));
 
 // Use the user routes
 app.use('/api/users', userRoutes);
+app.use('/api/auth', authRoutes); 
 
 // Home route for the API
 app.get('/', (req: Request, res: Response) => {

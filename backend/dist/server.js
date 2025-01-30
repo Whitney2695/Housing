@@ -8,6 +8,7 @@ const express_1 = __importDefault(require("express"));
 const cors_1 = __importDefault(require("cors"));
 const client_1 = require("@prisma/client");
 const userRoutes_1 = __importDefault(require("./Routes/userRoutes"));
+const authRoutes_1 = __importDefault(require("./Routes/authRoutes"));
 const path_1 = __importDefault(require("path"));
 const http_1 = __importDefault(require("http"));
 const app = (0, express_1.default)();
@@ -21,6 +22,7 @@ app.use(express_1.default.json());
 app.use((0, cors_1.default)(corsOptions));
 // Use the user routes
 app.use('/api/users', userRoutes_1.default);
+app.use('/api/auth', authRoutes_1.default);
 // Home route for the API
 app.get('/', (req, res) => {
     res.send('Welcome to the API');
