@@ -3,8 +3,8 @@ POST http://localhost:3000/api/auth/login
 Content-Type: application/json
 
 {
-  "email": "whitneyjacks685@gmail.com",
-  "password": "password123"
+  "email": "johndoe@example.com",
+  "password": "securepassword"
 }
 
 ### Hash Password Request
@@ -12,5 +12,5 @@ POST http://localhost:3000/api/auth/hash-password
 Content-Type: application/json
 
 {
-  "password": "password123"
+  "password": "securepassword"
 }

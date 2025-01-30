@@ -17,16 +17,36 @@ class DeveloperController {
     // ✅ Create Developer
     createDeveloper(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { name, contactInfo } = req.body;
-            if (!name || !contactInfo) {
-                return res.status(400).json({ message: 'Name and contactInfo are required' });
+            const { name, contactInfo, email, password } = req.body;
+            if (!name || !contactInfo || !email || !password) {
+                return res.status(400).json({ message: 'All fields are required' });
             }
             try {
-                const developer = yield developerService_1.default.createDeveloper(name, contactInfo);
+                const developer = yield developerService_1.default.createDeveloper(name, contactInfo, email, password, "developer");
                 return res.status(201).json(developer);
             }
             catch (error) {
                 return res.status(500).json({ message: 'Error creating developer', error });
+            }
+        });
+    }
+    // ✅ Login Developer
+    loginDeveloper(req, res) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { email, password } = req.body;
+            if (!email || !password) {
+                return res.status(400).json({ message: 'Email and password are required' });
+            }
+            try {
+                const user = yield developerService_1.default.loginDeveloper(email, password);
+                if (!user) {
+                    return res.status(401).json({ message: 'Invalid credentials' });
+                }
+                // Return the authenticated user (You can also add JWT here for token-based authentication)
+                return res.status(200).json({ message: 'Login successful', user });
+            }
+            catch (error) {
+                return res.status(500).json({ message: 'Error logging in', error });
             }
         });
     }

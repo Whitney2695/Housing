@@ -4,8 +4,11 @@ Content-Type: application/json
 
 {
   "name": "John Doe",
-  "contactInfo": "0789633432"
+  "contactInfo": "0789633432",
+  "email": "johndoe@example.com",
+  "password": "securepassword"
 }
+
 
 ### Get All Developers
 GET http://localhost:3000/api/developers
@@ -23,4 +26,4 @@ Content-Type: application/json
 }
 
 ### Delete Developer
-DELETE http://localhost:3000/api/developers/{DeveloperID}
+DELETE http://localhost:3000/api/developers/{9210065a-96d9-4e51-b7e9-64eb66f7d0ea}
