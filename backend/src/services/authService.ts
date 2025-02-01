@@ -1,11 +1,15 @@
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { PrismaClient } from '@prisma/client';
+import dotenv from 'dotenv';
+
+// Load environment variables from a .env file
+dotenv.config();
 
 const prisma = new PrismaClient();
 
 class AuthService {
-  private jwtSecret: string = process.env.JWT_SECRET || 'your_jwt_secret_key'; // Use environment variables
+  private jwtSecret: string = process.env.JWT_SECRET || 'your-default-jwt-secret-key'; // Use environment variable for secret key
 
   async login(email: string, password: string) {
     const user = await prisma.user.findUnique({
@@ -42,8 +46,8 @@ class AuthService {
         email: user.Email,
         role: user.Role,
       },
-      this.jwtSecret,
-      { expiresIn: '1h' }
+      this.jwtSecret, // Consistent secret key
+      { expiresIn: '1h' } // Token expiration (1 hour)
     );
   }
 

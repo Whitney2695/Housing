@@ -15,10 +15,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
 const client_1 = require("@prisma/client");
+const dotenv_1 = __importDefault(require("dotenv"));
+// Load environment variables from a .env file
+dotenv_1.default.config();
 const prisma = new client_1.PrismaClient();
 class AuthService {
     constructor() {
-        this.jwtSecret = process.env.JWT_SECRET || 'your_jwt_secret_key'; // Use environment variables
+        this.jwtSecret = process.env.JWT_SECRET || 'your-default-jwt-secret-key'; // Use environment variable for secret key
     }
     login(email, password) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -50,7 +53,9 @@ class AuthService {
             id: user.UserID,
             email: user.Email,
             role: user.Role,
-        }, this.jwtSecret, { expiresIn: '1h' });
+        }, this.jwtSecret, // Consistent secret key
+        { expiresIn: '1h' } // Token expiration (1 hour)
+        );
     }
     hashPassword(password) {
         return __awaiter(this, void 0, void 0, function* () {

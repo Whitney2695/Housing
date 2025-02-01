@@ -4,6 +4,7 @@ import { PrismaClient } from '@prisma/client';
 import userRoutes from './Routes/userRoutes';
 import authRoutes from './Routes/authRoutes';
 import developerRoutes from './Routes/developerRoutes';
+import projectRoutes from './Routes/projectRoutes';
 import path from 'path';
 import http from 'http';
 
@@ -23,6 +24,7 @@ app.use(cors(corsOptions));
 app.use('/api/users', userRoutes);
 app.use('/api/auth', authRoutes); 
 app.use('/api/developers', developerRoutes);
+app.use('/api', projectRoutes);
 
 // Home route for the API
 app.get('/', (req: Request, res: Response) => {

@@ -53,6 +53,7 @@ model Project {
   EligibilityCriteria Json
   MinCreditScore      Int
   InterestRate        Float
+  ProjectImageUrl     String? 
   DeveloperID         String        @db.Uuid // Ensure this is uuid
   StartDate           DateTime?
   CreatedAt           DateTime      @default(now())

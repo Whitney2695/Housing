@@ -14,7 +14,7 @@ Content-Type: application/json
 GET http://localhost:3000/api/developers
 
 ### Get Developer by ID
-GET http://localhost:3000/api/developers/{DeveloperID}
+GET http://localhost:3000/api/developers/{353aed62-1ee8-43ed-8e83-4e60bd60dab5}
 
 ### Update Developer
 PUT http://localhost:3000/api/developers/{DeveloperID}

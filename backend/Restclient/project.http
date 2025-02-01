@@ -1,0 +1,31 @@
+###create project
+POST http://localhost:3000/api/projects
+Content-Type: multipart/form-data
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjBmYWE1Zjg5LTJiZjctNGQxZi05MWM2LTQyMGQwOTE5ZmQ5MCIsImVtYWlsIjoiam9obmRvZUBleGFtcGxlLmNvbSIsInJvbGUiOiJkZXZlbG9wZXIiLCJpYXQiOjE3Mzg0MDc1NzIsImV4cCI6MTczODQxMTE3Mn0.D6w2lqRQDcVpTwQdd5n7HAqXD1dNVRUTr3jVK2Z3H20
+
+{
+  "Title": "New Project",
+  "Description": "This is a new project.",
+  "MinCreditScore": 650,
+  "InterestRate": 5.5,
+  "EligibilityCriteria": {
+    "criteria": "Some eligibility criteria"
+  },
+  "ProgressPercentage": 0,
+  "Status": "Planned",
+  "StartDate": "2025-01-30T00:00:00Z",
+  "Latitude": 12.34,
+  "Longitude": 56.78,
+  "image": (image file)
+}
+
+
+### get all projects
+GET http://localhost:3000/api/projects
+Content-Type: multipart/form-data
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjBmYWE1Zjg5LTJiZjctNGQxZi05MWM2LTQyMGQwOTE5ZmQ5MCIsImVtYWlsIjoiam9obmRvZUBleGFtcGxlLmNvbSIsInJvbGUiOiJkZXZlbG9wZXIiLCJpYXQiOjE3Mzg0MDc1NzIsImV4cCI6MTczODQxMTE3Mn0.D6w2lqRQDcVpTwQdd5n7HAqXD1dNVRUTr3jVK2Z3H20
+
+
+### get project by ID
+GET http://localhost:3000/api/projects/{ProjectID}
+
