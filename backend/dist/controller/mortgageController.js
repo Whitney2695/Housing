@@ -13,16 +13,15 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteMortgageController = exports.updateMortgageController = exports.getAllMortgagesController = exports.getMortgageByIdController = exports.createMortgageController = void 0;
-const mortgageService_1 = __importDefault(require("../services/mortgageService")); // Assuming this is where the service is located
+const mortgageService_1 = __importDefault(require("../services/mortgageService"));
+// Create Mortgage Controller
 const createMortgageController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const mortgageDetails = req.body;
-        // Create mortgage
         const newMortgage = yield mortgageService_1.default.createMortgage(mortgageDetails);
-        // Respond with success message and mortgage details
         res.status(201).json({
             message: 'Mortgage created successfully',
-            mortgage: newMortgage, // Return the mortgage details
+            mortgage: newMortgage,
         });
     }
     catch (error) {
@@ -30,43 +29,51 @@ const createMortgageController = (req, res) => __awaiter(void 0, void 0, void 0,
     }
 });
 exports.createMortgageController = createMortgageController;
+// Get Mortgage by ID Controller (No Authorization)
 const getMortgageByIdController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const mortgageId = req.params.id;
-        // Your logic to fetch mortgage by ID
-        res.status(200).json({ mortgageId });
+        const mortgage = yield mortgageService_1.default.getMortgageById(mortgageId);
+        if (!mortgage) {
+            res.status(404).json({ message: 'Mortgage not found' });
+            return;
+        }
+        res.status(200).json(mortgage);
     }
     catch (error) {
         res.status(500).json({ message: 'Error fetching mortgage', error });
     }
 });
 exports.getMortgageByIdController = getMortgageByIdController;
-// Added the getAllMortgagesController
+// Get All Mortgages Controller (No Authorization)
 const getAllMortgagesController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const mortgages = yield mortgageService_1.default.getAllMortgages(); // Fetch all mortgages from the service
-        res.status(200).json(mortgages); // Return all mortgages
+        const mortgages = yield mortgageService_1.default.getAllMortgages();
+        res.status(200).json(mortgages);
     }
     catch (error) {
         res.status(500).json({ message: 'Error fetching mortgages', error });
     }
 });
 exports.getAllMortgagesController = getAllMortgagesController;
+// Update Mortgage Controller (Authorization Required)
 const updateMortgageController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const mortgageId = req.params.id;
-        // Your logic for updating mortgage
-        res.status(200).json({ message: 'Mortgage updated successfully' });
+        const mortgageDetails = req.body;
+        const updatedMortgage = yield mortgageService_1.default.updateMortgage(mortgageId, mortgageDetails);
+        res.status(200).json(updatedMortgage); // Includes success message and updated mortgage details
     }
     catch (error) {
         res.status(500).json({ message: 'Error updating mortgage', error });
     }
 });
 exports.updateMortgageController = updateMortgageController;
+// Delete Mortgage Controller (Authorization Required)
 const deleteMortgageController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const mortgageId = req.params.id;
-        // Your logic for deleting a mortgage
+        yield mortgageService_1.default.deleteMortgage(mortgageId);
         res.status(200).json({ message: 'Mortgage deleted successfully' });
     }
     catch (error) {

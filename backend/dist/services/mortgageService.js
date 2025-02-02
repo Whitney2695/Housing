@@ -15,19 +15,23 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const client_1 = require("@prisma/client");
 const axios_1 = __importDefault(require("axios"));
 const dotenv_1 = __importDefault(require("dotenv"));
-// Load environment variables from .env file
+// Load environment variables
 dotenv_1.default.config();
 const prisma = new client_1.PrismaClient();
-// Mortgage Service
 class MortgageService {
     constructor() {
-        this.brevoApiKey = process.env.BREVO_API_KEY; // Ensure this is set in your .env file
-        this.brevoSenderEmail = process.env.BREVO_SENDER_EMAIL; // Sender email for Brevo
-        this.companyName = 'Haven Builders'; // Company name for email customization
+        this.brevoApiKey = process.env.BREVO_API_KEY;
+        this.brevoSenderEmail = process.env.BREVO_SENDER_EMAIL;
+        this.companyName = 'Haven Builders';
         this.logoUrl = 'http://localhost:5000/images/house.jpg';
+        console.log('MortgageService initialized.');
     }
-    // Mortgage Calculation function
+    // Mortgage Calculation
     calculateMortgage(loanAmount, interestRate, loanTermYears) {
+        console.log('Calculating mortgage with:', { loanAmount, interestRate, loanTermYears });
+        if (interestRate <= 0 || loanAmount <= 0 || loanTermYears <= 0) {
+            throw new Error('Invalid loan parameters. Ensure all values are greater than zero.');
+        }
         const monthlyRate = interestRate / 100 / 12;
         const numberOfPayments = loanTermYears * 12;
         const monthlyPayment = loanAmount *
@@ -35,13 +39,15 @@ class MortgageService {
             (Math.pow(1 + monthlyRate, numberOfPayments) - 1);
         const totalPayment = monthlyPayment * numberOfPayments;
         const totalInterest = totalPayment - loanAmount;
+        console.log('Mortgage calculated successfully.');
         return { monthlyPayment, totalPayment, totalInterest };
     }
-    // Send an email using Brevo (same method as in UsersService)
+    // Send Email using Brevo
     sendEmail(to, subject, content) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a, _b;
             try {
+                console.log(`Sending email to ${to}...`);
                 const response = yield axios_1.default.post('https://api.brevo.com/v3/smtp/email', {
                     sender: { email: this.brevoSenderEmail },
                     to: [{ email: to }],
@@ -56,86 +62,152 @@ class MortgageService {
                 console.log(`Email sent successfully: ${response.status}`);
             }
             catch (error) {
-                const errorMessage = ((_b = (_a = error.response) === null || _a === void 0 ? void 0 : _a.data) === null || _b === void 0 ? void 0 : _b.message) || error.message || 'Unknown error occurred';
-                console.error('Failed to send email:', errorMessage);
-                throw new Error(`Email sending failed: ${errorMessage}`);
+                console.error('Failed to send email:', ((_b = (_a = error.response) === null || _a === void 0 ? void 0 : _a.data) === null || _b === void 0 ? void 0 : _b.message) || error.message);
             }
         });
     }
     // Create Mortgage
     createMortgage(mortgageDetails) {
         return __awaiter(this, void 0, void 0, function* () {
-            const { monthlyPayment, totalPayment, totalInterest } = this.calculateMortgage(mortgageDetails.loanAmount, mortgageDetails.interestRate, mortgageDetails.loanTermYears);
-            const newMortgage = yield prisma.mortgage.create({
-                data: {
-                    UserID: mortgageDetails.userId,
-                    Income: mortgageDetails.income,
-                    LoanAmount: mortgageDetails.loanAmount,
-                    InterestRate: mortgageDetails.interestRate,
-                    LoanTermYears: mortgageDetails.loanTermYears,
-                    MonthlyPayment: monthlyPayment,
-                    TotalPayment: totalPayment,
-                    TotalInterest: totalInterest,
-                    CreditScore: mortgageDetails.creditScore,
-                    IsEligible: true,
-                    CalculatedAt: new Date(),
-                    projectId: mortgageDetails.projectId,
-                },
-            });
-            const user = yield prisma.user.findUnique({
-                where: { UserID: mortgageDetails.userId },
-            });
-            if (user) {
-                const emailContent = `
-        <h2>Mortgage Approval Details</h2>
-        <p>Your mortgage has been approved. Here are the details:</p>
-        <ul>
-          <li>Loan Amount: ${mortgageDetails.loanAmount}</li>
-          <li>Monthly Payment: ${monthlyPayment.toFixed(2)}</li>
-          <li>Total Payment: ${totalPayment.toFixed(2)}</li>
-          <li>Total Interest: ${totalInterest.toFixed(2)}</li>
-          <li>Credit Score: ${mortgageDetails.creditScore}</li>
-        </ul>
-        <p>Thank you for choosing our services!</p>
-      `;
-                yield this.sendEmail(user.Email, 'Mortgage Approval Details', emailContent);
+            try {
+                console.log('Creating new mortgage...');
+                // Check if the user already has a mortgage for the same project
+                const existingMortgage = yield prisma.mortgage.findFirst({
+                    where: {
+                        UserID: mortgageDetails.userId,
+                        projectId: mortgageDetails.projectId || null,
+                    },
+                });
+                if (existingMortgage) {
+                    console.error('Mortgage already exists for this user and project.');
+                    throw new Error('Mortgage already exists for this user and project');
+                }
+                let interestRate = mortgageDetails.interestRate;
+                if (mortgageDetails.projectId) {
+                    const project = yield prisma.project.findUnique({
+                        where: { ProjectID: mortgageDetails.projectId },
+                    });
+                    if (!project) {
+                        console.error('Project not found.');
+                        throw new Error('Project not found');
+                    }
+                    interestRate = project.InterestRate || mortgageDetails.interestRate;
+                }
+                const { monthlyPayment, totalPayment, totalInterest } = this.calculateMortgage(mortgageDetails.loanAmount, interestRate, mortgageDetails.loanTermYears);
+                const newMortgage = yield prisma.mortgage.create({
+                    data: {
+                        UserID: mortgageDetails.userId,
+                        Income: mortgageDetails.income,
+                        LoanAmount: mortgageDetails.loanAmount,
+                        InterestRate: interestRate,
+                        LoanTermYears: mortgageDetails.loanTermYears,
+                        MonthlyPayment: monthlyPayment,
+                        TotalPayment: totalPayment,
+                        TotalInterest: totalInterest,
+                        CreditScore: mortgageDetails.creditScore,
+                        IsEligible: true,
+                        CalculatedAt: new Date(),
+                        projectId: mortgageDetails.projectId || null,
+                    },
+                });
+                console.log('Mortgage created successfully:', newMortgage);
+                return newMortgage;
             }
-            return newMortgage;
+            catch (error) {
+                console.error('Error creating mortgage:', error.message);
+                throw new Error('Mortgage creation failed');
+            }
         });
     }
     // Get Mortgage by ID
     getMortgageById(mortgageId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const mortgage = yield prisma.mortgage.findUnique({
-                where: { MortgageID: mortgageId },
-            });
+            console.log(`Fetching mortgage with ID: ${mortgageId}...`);
+            const mortgage = yield prisma.mortgage.findUnique({ where: { MortgageID: mortgageId } });
+            if (!mortgage)
+                throw new Error('Mortgage not found');
             return mortgage;
         });
     }
     // Get All Mortgages
     getAllMortgages() {
         return __awaiter(this, void 0, void 0, function* () {
-            const mortgages = yield prisma.mortgage.findMany(); // This will fetch all mortgage records
-            return mortgages;
+            console.log('Fetching all mortgages...');
+            return yield prisma.mortgage.findMany();
         });
     }
     // Update Mortgage
     updateMortgage(mortgageId, mortgageDetails) {
         return __awaiter(this, void 0, void 0, function* () {
-            const updatedMortgage = yield prisma.mortgage.update({
-                where: { MortgageID: mortgageId },
-                data: mortgageDetails,
-            });
-            return updatedMortgage;
+            try {
+                console.log(`Updating mortgage with ID: ${mortgageId}...`);
+                const existingMortgage = yield prisma.mortgage.findUnique({ where: { MortgageID: mortgageId } });
+                if (!existingMortgage) {
+                    console.error('Mortgage not found.');
+                    throw new Error('Mortgage not found');
+                }
+                let interestRate = mortgageDetails.interestRate;
+                if (mortgageDetails.projectId) {
+                    const project = yield prisma.project.findUnique({ where: { ProjectID: mortgageDetails.projectId } });
+                    if (!project) {
+                        console.error('Project not found.');
+                        throw new Error('Project not found');
+                    }
+                    interestRate = project.InterestRate;
+                }
+                const { monthlyPayment, totalPayment, totalInterest } = this.calculateMortgage(mortgageDetails.loanAmount, interestRate, mortgageDetails.loanTermYears);
+                const updatedMortgage = yield prisma.mortgage.update({
+                    where: { MortgageID: mortgageId },
+                    data: {
+                        Income: mortgageDetails.income,
+                        LoanAmount: mortgageDetails.loanAmount,
+                        InterestRate: interestRate,
+                        LoanTermYears: mortgageDetails.loanTermYears,
+                        MonthlyPayment: monthlyPayment,
+                        TotalPayment: totalPayment,
+                        TotalInterest: totalInterest,
+                        CreditScore: mortgageDetails.creditScore,
+                    },
+                });
+                console.log('Mortgage updated successfully:', updatedMortgage);
+                // Send email after successful update
+                const subject = 'Your Mortgage Details Have Been Updated';
+                const content = `
+        <p>Dear Customer,</p>
+        <p>Your mortgage details have been successfully updated. Here are your new mortgage details:</p>
+        <p><strong>Loan Amount:</strong> ${updatedMortgage.LoanAmount}</p>
+        <p><strong>Interest Rate:</strong> ${updatedMortgage.InterestRate}%</p>
+        <p><strong>Monthly Payment:</strong> ${updatedMortgage.MonthlyPayment}</p>
+        <p><strong>Total Payment:</strong> ${updatedMortgage.TotalPayment}</p>
+        <p><strong>Total Interest:</strong> ${updatedMortgage.TotalInterest}</p>
+        <p>If you have any questions, please contact us at support@havenbuilders.com.</p>
+        <p>Thank you for choosing Haven Builders!</p>
+        <img src="${this.logoUrl}" alt="${this.companyName} Logo" />
+      `;
+                // Send the email to a static address (e.g., support or admin email)
+                const staticEmail = 'support@havenbuilders.com'; // Replace with your desired email address
+                yield this.sendEmail(staticEmail, subject, content);
+                return updatedMortgage;
+            }
+            catch (error) {
+                console.error('Error updating mortgage:', error.message);
+                throw new Error('Mortgage update failed');
+            }
         });
     }
     // Delete Mortgage
     deleteMortgage(mortgageId) {
         return __awaiter(this, void 0, void 0, function* () {
-            const deletedMortgage = yield prisma.mortgage.delete({
-                where: { MortgageID: mortgageId },
-            });
-            return deletedMortgage;
+            try {
+                console.log(`Deleting mortgage with ID: ${mortgageId}...`);
+                const deletedMortgage = yield prisma.mortgage.delete({ where: { MortgageID: mortgageId } });
+                console.log('Mortgage deleted successfully:', deletedMortgage);
+                return deletedMortgage;
+            }
+            catch (error) {
+                console.error('Error deleting mortgage:', error.message);
+                throw new Error('Mortgage deletion failed');
+            }
         });
     }
 }
