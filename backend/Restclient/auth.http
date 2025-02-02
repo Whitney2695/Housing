@@ -7,6 +7,15 @@ Content-Type: application/json
   "password": "securepassword"
 }
 
+### Login Request
+POST http://localhost:3000/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "whitney@gmail.com",
+  "password": "password123"
+}
+
 ### Hash Password Request
 POST http://localhost:3000/api/auth/hash-password
 Content-Type: application/json

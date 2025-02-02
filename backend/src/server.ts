@@ -5,6 +5,7 @@ import userRoutes from './Routes/userRoutes';
 import authRoutes from './Routes/authRoutes';
 import developerRoutes from './Routes/developerRoutes';
 import projectRoutes from './Routes/projectRoutes';
+import mortgageRoutes from './Routes/mortgageRoutes';
 import path from 'path';
 import http from 'http';
 
@@ -20,13 +21,14 @@ const corsOptions = {
 app.use(express.json());
 app.use(cors(corsOptions));
 
-// Use the user routes
+
 app.use('/api/users', userRoutes);
 app.use('/api/auth', authRoutes); 
 app.use('/api/developers', developerRoutes);
 app.use('/api', projectRoutes);
+app.use('/api/mortgages', mortgageRoutes);
 
-// Home route for the API
+
 app.get('/', (req: Request, res: Response) => {
     res.send('Welcome to the API');
 });

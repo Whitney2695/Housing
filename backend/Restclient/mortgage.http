@@ -1,0 +1,45 @@
+###Create a new mortgage
+POST http://localhost:3000/api/mortgages/create
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNiYzFiNGMwLThkNDYtNGUxNC1hZGFlLTNlODhkMDM3YTNmNSIsImVtYWlsIjoid2hpdG5leUBnbWFpbC5jb20iLCJyb2xlIjoidXNlciIsImlhdCI6MTczODUwMzIyNywiZXhwIjoxNzM4NTA2ODI3fQ.DPkv_18x0KzAjfRpgP4PgRorEzgQMi2pISjSXHVcuG4
+
+{
+  "userId": "cbc1b4c0-8d46-4e14-adae-3e88d037a3f5",
+  "income": 5000,
+  "loanAmount": 200000,
+  "interestRate": 5.0,
+  "loanTermYears": 30,
+  "creditScore": 750,
+  "projectId": "410e105e-2f52-4eb4-8f0f-9744984aede2"
+}
+
+
+###Get all mortgages
+GET http://localhost:3000/api/mortgages/
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNiYzFiNGMwLThkNDYtNGUxNC1hZGFlLTNlODhkMDM3YTNmNSIsImVtYWlsIjoid2hpdG5leUBnbWFpbC5jb20iLCJyb2xlIjoidXNlciIsImlhdCI6MTczODUwMzIyNywiZXhwIjoxNzM4NTA2ODI3fQ.DPkv_18x0KzAjfRpgP4PgRorEzgQMi2pISjSXHVcuG4
+
+
+###Get mortgage by ID
+GET http://localhost:3000/api/mortgages/{0c4c578d-024e-4256-8611-f0e8249ccaef}
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNiYzFiNGMwLThkNDYtNGUxNC1hZGFlLTNlODhkMDM3YTNmNSIsImVtYWlsIjoid2hpdG5leUBnbWFpbC5jb20iLCJyb2xlIjoidXNlciIsImlhdCI6MTczODUwMzIyNywiZXhwIjoxNzM4NTA2ODI3fQ.DPkv_18x0KzAjfRpgP4PgRorEzgQMi2pISjSXHVcuG4
+
+
+###Update mortgage
+PUT http://localhost:3000/api/mortgages/{0c4c578d-024e-4256-8611-f0e8249ccaef}
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNiYzFiNGMwLThkNDYtNGUxNC1hZGFlLTNlODhkMDM3YTNmNSIsImVtYWlsIjoid2hpdG5leUBnbWFpbC5jb20iLCJyb2xlIjoidXNlciIsImlhdCI6MTczODUwMzIyNywiZXhwIjoxNzM4NTA2ODI3fQ.DPkv_18x0KzAjfRpgP4PgRorEzgQMi2pISjSXHVcuG4
+
+{
+  "income": 6000,
+  "loanAmount": 250000,
+  "interestRate": 4.5,
+  "loanTermYears": 25,
+  "creditScore": 800
+}
+
+###Delete mortgage
+DELETE http://localhost:3000/api/mortgages/{mortgageId}
+Content-Type: application/json
+
