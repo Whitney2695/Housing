@@ -79,8 +79,9 @@ class MortgageService {
                     },
                 });
                 if (existingMortgage) {
-                    console.error('Mortgage already exists for this user and project.');
-                    throw new Error('Mortgage already exists for this user and project');
+                    const errorMessage = 'Mortgage exists for this user and project';
+                    console.error(errorMessage);
+                    throw new Error(errorMessage); // Throw the error to be caught in the catch block
                 }
                 let interestRate = mortgageDetails.interestRate;
                 if (mortgageDetails.projectId) {
@@ -88,8 +89,9 @@ class MortgageService {
                         where: { ProjectID: mortgageDetails.projectId },
                     });
                     if (!project) {
-                        console.error('Project not found.');
-                        throw new Error('Project not found');
+                        const errorMessage = 'Project not found';
+                        console.error(errorMessage);
+                        throw new Error(errorMessage);
                     }
                     interestRate = project.InterestRate || mortgageDetails.interestRate;
                 }
@@ -114,8 +116,12 @@ class MortgageService {
                 return newMortgage;
             }
             catch (error) {
+                // Log the error to the console
                 console.error('Error creating mortgage:', error.message);
-                throw new Error('Mortgage creation failed');
+                // Return the error message in the response
+                throw {
+                    error: error.message || error,
+                };
             }
         });
     }
@@ -191,7 +197,11 @@ class MortgageService {
             }
             catch (error) {
                 console.error('Error updating mortgage:', error.message);
-                throw new Error('Mortgage update failed');
+                throw {
+                    status: 500,
+                    message: 'Error updating mortgage',
+                    error: error.message || error,
+                };
             }
         });
     }
@@ -206,7 +216,11 @@ class MortgageService {
             }
             catch (error) {
                 console.error('Error deleting mortgage:', error.message);
-                throw new Error('Mortgage deletion failed');
+                throw {
+                    status: 500,
+                    message: 'Error deleting mortgage',
+                    error: error.message || error,
+                };
             }
         });
     }

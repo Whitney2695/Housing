@@ -4,7 +4,7 @@ Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNiYzFiNGMwLThkNDYtNGUxNC1hZGFlLTNlODhkMDM3YTNmNSIsImVtYWlsIjoid2hpdG5leUBnbWFpbC5jb20iLCJyb2xlIjoidXNlciIsImlhdCI6MTczODUwNzIzMSwiZXhwIjoxNzM4NTEwODMxfQ.xRWwY_NotB52aNh5vBRDPCSdSf3xfamDOaBrjyLzkt0
 
 {
-  "userId": "cbc1b4c0-8d46-4e14-adae-3e88d037a3f5",
+  "userId": "36b4937e-6076-46d8-85c2-056458c941c2",
   "income": 5000,
   "loanAmount": 200000,
   "interestRate": 5.0,
@@ -38,6 +38,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNiYzFiNGMwL
 }
 
 ###Delete mortgage
-DELETE http://localhost:3000/api/mortgages/{mortgageId}
+DELETE http://localhost:3000/api/mortgages/{a18f9472-695d-42ba-a71b-6cce581348ef}
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNiYzFiNGMwLThkNDYtNGUxNC1hZGFlLTNlODhkMDM3YTNmNSIsImVtYWlsIjoid2hpdG5leUBnbWFpbC5jb20iLCJyb2xlIjoidXNlciIsImlhdCI6MTczODUwNzIzMSwiZXhwIjoxNzM4NTEwODMxfQ.xRWwY_NotB52aNh5vBRDPCSdSf3xfamDOaBrjyLzkt0
 
