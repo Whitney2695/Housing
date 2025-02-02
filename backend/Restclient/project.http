@@ -1,29 +1,32 @@
 ###create project
 POST http://localhost:3000/api/projects
-Content-Type: multipart/form-data
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjBmYWE1Zjg5LTJiZjctNGQxZi05MWM2LTQyMGQwOTE5ZmQ5MCIsImVtYWlsIjoiam9obmRvZUBleGFtcGxlLmNvbSIsInJvbGUiOiJkZXZlbG9wZXIiLCJpYXQiOjE3Mzg0MDc1NzIsImV4cCI6MTczODQxMTE3Mn0.D6w2lqRQDcVpTwQdd5n7HAqXD1dNVRUTr3jVK2Z3H20
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjBmYWE1Zjg5LTJiZjctNGQxZi05MWM2LTQyMGQwOTE5ZmQ5MCIsImVtYWlsIjoiam9obmRvZUBleGFtcGxlLmNvbSIsInJvbGUiOiJkZXZlbG9wZXIiLCJpYXQiOjE3Mzg0OTg1ODUsImV4cCI6MTczODUwMjE4NX0.bb9EvvwQ_xcJgauJ2juR8KUgnFdbtrectwHKEioc46s
 
 {
-  "Title": "New Project",
-  "Description": "This is a new project.",
-  "MinCreditScore": 650,
-  "InterestRate": 5.5,
-  "EligibilityCriteria": {
-    "criteria": "Some eligibility criteria"
-  },
-  "ProgressPercentage": 0,
-  "Status": "Planned",
-  "StartDate": "2025-01-30T00:00:00Z",
-  "Latitude": 12.34,
-  "Longitude": 56.78,
-  "image": (image file)
+  "Title": "Another House Project",
+  "Description": "This is another new house project.",
+  "MinCreditScore": 700,
+  "InterestRate": 4.8,
+  "EligibilityCriteria": [
+    "Minimum credit score of 700",
+    "Must be employed full-time",
+    "Must have a down payment of at least 10%",
+    "No previous bankruptcy in the last 7 years"
+  ],
+  "ProgressPercentage": 20,
+  "Status": "InProgress",
+  "StartDate": "2025-02-01T00:00:00Z",
+  "Latitude": 34.56,
+  "Longitude": 78.90,
+  "image": "assets/house2"
 }
+
 
 
 ### get all projects
 GET http://localhost:3000/api/projects
-Content-Type: multipart/form-data
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjBmYWE1Zjg5LTJiZjctNGQxZi05MWM2LTQyMGQwOTE5ZmQ5MCIsImVtYWlsIjoiam9obmRvZUBleGFtcGxlLmNvbSIsInJvbGUiOiJkZXZlbG9wZXIiLCJpYXQiOjE3Mzg0MDc1NzIsImV4cCI6MTczODQxMTE3Mn0.D6w2lqRQDcVpTwQdd5n7HAqXD1dNVRUTr3jVK2Z3H20
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjBmYWE1Zjg5LTJiZjctNGQxZi05MWM2LTQyMGQwOTE5ZmQ5MCIsImVtYWlsIjoiam9obmRvZUBleGFtcGxlLmNvbSIsInJvbGUiOiJkZXZlbG9wZXIiLCJpYXQiOjE3Mzg0OTg1ODUsImV4cCI6MTczODUwMjE4NX0.bb9EvvwQ_xcJgauJ2juR8KUgnFdbtrectwHKEioc46s
 
 
 ### get project by ID

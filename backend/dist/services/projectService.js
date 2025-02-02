@@ -11,30 +11,87 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteProject = exports.updateProject = exports.getProjectById = exports.getProjects = exports.createProject = void 0;
 const client_1 = require("@prisma/client");
-const imageService_1 = require("./imageService"); // Ensure correct import path
+const cloudinary_1 = require("cloudinary");
+// Initialize Prisma Client  
 const prisma = new client_1.PrismaClient();
-// Function to create a new project
-const createProject = (req) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
+// Configure Cloudinary  
+cloudinary_1.v2.config({
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+// Function to upload an image to Cloudinary  
+const uploadImageToCloudinary = (file) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        const result = yield cloudinary_1.v2.uploader.upload(file.path, {
+            folder: 'projects',
+            resource_type: 'image',
+        });
+        return result.secure_url;
+    }
+    catch (error) {
+        console.error('Error uploading to Cloudinary:', error);
+        return null; // Return null if upload fails  
+    }
+});
+// Create a new project  
+const createProject = (req) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a, _b;
+    try {
+        console.log('Request Body:', req.body);
         const { Title, Description, MinCreditScore, InterestRate, EligibilityCriteria, ProgressPercentage, Status, StartDate, Latitude, Longitude, } = req.body;
-        const tokenDeveloperID = (_a = req.user) === null || _a === void 0 ? void 0 : _a.id; // DeveloperID from the token
-        // Ensure the DeveloperID from the token is available and valid
-        if (!tokenDeveloperID) {
-            console.error('Unauthorized: No Developer ID found in token');
-            throw new Error('Unauthorized: No Developer ID found in token');
-        }
-        // Ensure required fields are present in the request
+        // Check if User ID and Developer ID are present in the token
+        console.log('User ID from token:', (_a = req.user) === null || _a === void 0 ? void 0 : _a.id);
+        if (!((_b = req.user) === null || _b === void 0 ? void 0 : _b.id))
+            throw new Error('Unauthorized: No User ID found in token');
+        // Check if required fields are present
         if (!Title || !Description || !MinCreditScore || !InterestRate || !EligibilityCriteria || !ProgressPercentage || !Status || !StartDate) {
-            console.error('Missing required fields');
-            throw new Error('Missing required fields');
+            const missingFields = [];
+            if (!Title)
+                missingFields.push('Title');
+            if (!Description)
+                missingFields.push('Description');
+            if (!MinCreditScore)
+                missingFields.push('MinCreditScore');
+            if (!InterestRate)
+                missingFields.push('InterestRate');
+            if (!EligibilityCriteria)
+                missingFields.push('EligibilityCriteria');
+            if (!ProgressPercentage)
+                missingFields.push('ProgressPercentage');
+            if (!Status)
+                missingFields.push('Status');
+            if (!StartDate)
+                missingFields.push('StartDate');
+            console.error('Missing required fields:', missingFields.join(', '));
+            throw new Error(`Missing required fields: ${missingFields.join(', ')}`);
         }
         let imageUrl = null;
         if (req.file) {
-            // Upload the project image to S3 if provided
-            imageUrl = yield (0, imageService_1.uploadImageToS3)(req.file);
+            console.log('Uploading image to Cloudinary...');
+            imageUrl = yield uploadImageToCloudinary(req.file);
+            if (imageUrl) {
+                console.log('Image URL:', imageUrl);
+            }
+            else {
+                console.log('Image upload failed');
+            }
         }
-        // Create the new project in the database
+        // Check if the User exists in the database
+        const user = yield prisma.user.findUnique({
+            where: { UserID: req.user.id }, // Look for the user by UserID
+        });
+        if (!user) {
+            throw new Error('User does not exist');
+        }
+        // Check if the Developer associated with the User exists
+        const developer = yield prisma.developer.findUnique({
+            where: { UserID: req.user.id }, // Find Developer by the UserID associated with the token's UserID
+        });
+        if (!developer) {
+            throw new Error('Developer not found for the provided User ID');
+        }
+        console.log('Creating new project in the database...');
         const newProject = yield prisma.project.create({
             data: {
                 Title,
@@ -46,14 +103,9 @@ const createProject = (req) => __awaiter(void 0, void 0, void 0, function* () {
                 Status,
                 StartDate,
                 ProjectImageUrl: imageUrl,
-                Developer: {
-                    connect: {
-                        DeveloperID: tokenDeveloperID, // Automatically connect the developer using the ID from the token
-                    },
-                },
+                DeveloperID: developer.DeveloperID, // Use the DeveloperID found from the Developer model
             },
         });
-        // If latitude and longitude are provided, store them in GIS_Locations table
         if (Latitude && Longitude) {
             yield prisma.gISLocation.create({
                 data: {
@@ -63,7 +115,6 @@ const createProject = (req) => __awaiter(void 0, void 0, void 0, function* () {
                 },
             });
         }
-        // Return the created project data
         return newProject;
     }
     catch (error) {
@@ -72,15 +123,10 @@ const createProject = (req) => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 exports.createProject = createProject;
-// Get all projects
+// Get all projects  
 const getProjects = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const projects = yield prisma.project.findMany({
-            include: {
-                GIS_Locations: true,
-            },
-        });
-        return projects;
+        return yield prisma.project.findMany({ include: { GIS_Locations: true } });
     }
     catch (error) {
         console.error('Error fetching projects:', error);
@@ -88,14 +134,12 @@ const getProjects = () => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 exports.getProjects = getProjects;
-// Get a specific project by ID
+// Get a specific project by ID  
 const getProjectById = (projectId) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const project = yield prisma.project.findUnique({
             where: { ProjectID: projectId },
-            include: {
-                GIS_Locations: true,
-            },
+            include: { GIS_Locations: true },
         });
         if (!project)
             throw new Error('Project not found');
@@ -107,13 +151,11 @@ const getProjectById = (projectId) => __awaiter(void 0, void 0, void 0, function
     }
 });
 exports.getProjectById = getProjectById;
-// Update an existing project
+// Update an existing project  
 const updateProject = (projectId, data) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const updatedProject = yield prisma.project.update({
-            where: {
-                ProjectID: projectId,
-            },
+            where: { ProjectID: projectId },
             data: {
                 Title: data.Title,
                 Description: data.Description,
@@ -126,11 +168,16 @@ const updateProject = (projectId, data) => __awaiter(void 0, void 0, void 0, fun
             },
         });
         if (data.image) {
-            const imageUrl = yield (0, imageService_1.uploadImageToS3)(data.image);
-            yield prisma.project.update({
-                where: { ProjectID: projectId },
-                data: { ProjectImageUrl: imageUrl },
-            });
+            const imageUrl = yield uploadImageToCloudinary(data.image);
+            if (imageUrl) {
+                yield prisma.project.update({
+                    where: { ProjectID: projectId },
+                    data: { ProjectImageUrl: imageUrl },
+                });
+            }
+            else {
+                console.log('Image upload failed during update');
+            }
         }
         return updatedProject;
     }
@@ -140,12 +187,10 @@ const updateProject = (projectId, data) => __awaiter(void 0, void 0, void 0, fun
     }
 });
 exports.updateProject = updateProject;
-// Delete a project by ID
+// Delete a project  
 const deleteProject = (projectId) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        yield prisma.project.delete({
-            where: { ProjectID: projectId },
-        });
+        yield prisma.project.delete({ where: { ProjectID: projectId } });
         return { message: 'Project deleted successfully' };
     }
     catch (error) {

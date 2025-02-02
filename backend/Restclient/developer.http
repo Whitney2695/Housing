@@ -3,9 +3,9 @@ POST http://localhost:3000/api/developers
 Content-Type: application/json
 
 {
-  "name": "John Doe",
-  "contactInfo": "0789633432",
-  "email": "johndoe@example.com",
+  "name": "melo",
+  "contactInfo": "0789883432",
+  "email": "melo@example.com",
   "password": "securepassword"
 }
 

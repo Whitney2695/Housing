@@ -1,12 +1,35 @@
-import { CustomRequest } from '../middleware/authMiddleware';  // Ensure correct import path
-import { PrismaClient } from '@prisma/client';
-import { uploadImageToS3 } from './imageService'; // Ensure correct import path
+import { CustomRequest } from '../middleware/authMiddleware';  
+import { PrismaClient } from '@prisma/client';  
+import { v2 as cloudinary } from 'cloudinary';  
 
-const prisma = new PrismaClient();
+// Initialize Prisma Client  
+const prisma = new PrismaClient();  
 
-// Function to create a new project
+// Configure Cloudinary  
+cloudinary.config({  
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,  
+  api_key: process.env.CLOUDINARY_API_KEY,  
+  api_secret: process.env.CLOUDINARY_API_SECRET,  
+});  
+
+// Function to upload an image to Cloudinary  
+const uploadImageToCloudinary = async (file: Express.Multer.File): Promise<string | null> => {  
+  try {  
+    const result = await cloudinary.uploader.upload(file.path, {  
+      folder: 'projects',  
+      resource_type: 'image',  
+    });  
+    return result.secure_url;  
+  } catch (error) {  
+    console.error('Error uploading to Cloudinary:', error);  
+    return null; // Return null if upload fails  
+  }  
+};  
+
+// Create a new project  
 export const createProject = async (req: CustomRequest) => {
   try {
+    console.log('Request Body:', req.body);
     const {
       Title,
       Description,
@@ -20,27 +43,55 @@ export const createProject = async (req: CustomRequest) => {
       Longitude,
     } = req.body;
 
-    const tokenDeveloperID = req.user?.id; // DeveloperID from the token
+    // Check if User ID and Developer ID are present in the token
+    console.log('User ID from token:', req.user?.id);
+    if (!req.user?.id) throw new Error('Unauthorized: No User ID found in token');
 
-    // Ensure the DeveloperID from the token is available and valid
-    if (!tokenDeveloperID) {
-      console.error('Unauthorized: No Developer ID found in token');
-      throw new Error('Unauthorized: No Developer ID found in token');
-    }
-
-    // Ensure required fields are present in the request
+    // Check if required fields are present
     if (!Title || !Description || !MinCreditScore || !InterestRate || !EligibilityCriteria || !ProgressPercentage || !Status || !StartDate) {
-      console.error('Missing required fields');
-      throw new Error('Missing required fields');
+      const missingFields = [];
+      if (!Title) missingFields.push('Title');
+      if (!Description) missingFields.push('Description');
+      if (!MinCreditScore) missingFields.push('MinCreditScore');
+      if (!InterestRate) missingFields.push('InterestRate');
+      if (!EligibilityCriteria) missingFields.push('EligibilityCriteria');
+      if (!ProgressPercentage) missingFields.push('ProgressPercentage');
+      if (!Status) missingFields.push('Status');
+      if (!StartDate) missingFields.push('StartDate');
+      console.error('Missing required fields:', missingFields.join(', '));
+      throw new Error(`Missing required fields: ${missingFields.join(', ')}`);
     }
 
     let imageUrl: string | null = null;
     if (req.file) {
-      // Upload the project image to S3 if provided
-      imageUrl = await uploadImageToS3(req.file);
+      console.log('Uploading image to Cloudinary...');
+      imageUrl = await uploadImageToCloudinary(req.file);
+      if (imageUrl) {
+        console.log('Image URL:', imageUrl);
+      } else {
+        console.log('Image upload failed');
+      }
     }
 
-    // Create the new project in the database
+    // Check if the User exists in the database
+    const user = await prisma.user.findUnique({
+      where: { UserID: req.user.id }, // Look for the user by UserID
+    });
+
+    if (!user) {
+      throw new Error('User does not exist');
+    }
+
+    // Check if the Developer associated with the User exists
+    const developer = await prisma.developer.findUnique({
+      where: { UserID: req.user.id }, // Find Developer by the UserID associated with the token's UserID
+    });
+
+    if (!developer) {
+      throw new Error('Developer not found for the provided User ID');
+    }
+
+    console.log('Creating new project in the database...');
     const newProject = await prisma.project.create({
       data: {
         Title,
@@ -52,15 +103,10 @@ export const createProject = async (req: CustomRequest) => {
         Status,
         StartDate,
         ProjectImageUrl: imageUrl,
-        Developer: {
-          connect: {
-            DeveloperID: tokenDeveloperID, // Automatically connect the developer using the ID from the token
-          },
-        },
+        DeveloperID: developer.DeveloperID, // Use the DeveloperID found from the Developer model
       },
     });
 
-    // If latitude and longitude are provided, store them in GIS_Locations table
     if (Latitude && Longitude) {
       await prisma.gISLocation.create({
         data: {
@@ -71,7 +117,6 @@ export const createProject = async (req: CustomRequest) => {
       });
     }
 
-    // Return the created project data
     return newProject;
   } catch (error) {
     console.error('Error creating project:', error);
@@ -79,82 +124,76 @@ export const createProject = async (req: CustomRequest) => {
   }
 };
 
-// Get all projects
-export const getProjects = async () => {
-  try {
-    const projects = await prisma.project.findMany({
-      include: {
-        GIS_Locations: true,
-      },
-    });
-    return projects;
-  } catch (error) {
-    console.error('Error fetching projects:', error);
-    throw new Error('Error fetching projects');
-  }
-};
 
-// Get a specific project by ID
-export const getProjectById = async (projectId: string) => {
-  try {
-    const project = await prisma.project.findUnique({
-      where: { ProjectID: projectId },
-      include: {
-        GIS_Locations: true,
-      },
-    });
+// Get all projects  
+export const getProjects = async () => {  
+  try {  
+    return await prisma.project.findMany({ include: { GIS_Locations: true } });  
+  } catch (error) {  
+    console.error('Error fetching projects:', error);  
+    throw new Error('Error fetching projects');  
+  }  
+};  
 
-    if (!project) throw new Error('Project not found');
-    return project;
-  } catch (error) {
-    console.error('Error fetching project by ID:', error);
-    throw new Error('Error fetching project');
-  }
-};
+// Get a specific project by ID  
+export const getProjectById = async (projectId: string) => {  
+  try {  
+    const project = await prisma.project.findUnique({  
+      where: { ProjectID: projectId },  
+      include: { GIS_Locations: true },  
+    });  
 
-// Update an existing project
-export const updateProject = async (projectId: string, data: any) => {
-  try {
-    const updatedProject = await prisma.project.update({
-      where: {
-        ProjectID: projectId,
-      },
-      data: {
-        Title: data.Title,
-        Description: data.Description,
-        Status: data.Status,
-        ProgressPercentage: data.ProgressPercentage,
-        EligibilityCriteria: JSON.stringify(data.EligibilityCriteria),
-        MinCreditScore: data.MinCreditScore,
-        InterestRate: data.InterestRate,
-        StartDate: data.StartDate,
-      },
-    });
+    if (!project) throw new Error('Project not found');  
+    return project;  
+  } catch (error) {  
+    console.error('Error fetching project by ID:', error);  
+    throw new Error('Error fetching project');  
+  }  
+};  
 
-    if (data.image) {
-      const imageUrl = await uploadImageToS3(data.image);
-      await prisma.project.update({
-        where: { ProjectID: projectId },
-        data: { ProjectImageUrl: imageUrl },
-      });
-    }
+// Update an existing project  
+export const updateProject = async (projectId: string, data: any) => {  
+  try {  
+    const updatedProject = await prisma.project.update({  
+      where: { ProjectID: projectId },  
+      data: {  
+        Title: data.Title,  
+        Description: data.Description,  
+        Status: data.Status,  
+        ProgressPercentage: data.ProgressPercentage,  
+        EligibilityCriteria: JSON.stringify(data.EligibilityCriteria),  
+        MinCreditScore: data.MinCreditScore,  
+        InterestRate: data.InterestRate,  
+        StartDate: data.StartDate,  
+      },  
+    });  
 
-    return updatedProject;
-  } catch (error) {
-    console.error('Error updating project:', error);
-    throw new Error('Error updating project');
-  }
-};
+    if (data.image) {  
+      const imageUrl = await uploadImageToCloudinary(data.image);  
+      if (imageUrl) {
+        await prisma.project.update({  
+          where: { ProjectID: projectId },  
+          data: { ProjectImageUrl: imageUrl },  
+        });  
+      } else {
+        console.log('Image upload failed during update');
+      }
+    }  
 
-// Delete a project by ID
-export const deleteProject = async (projectId: string) => {
-  try {
-    await prisma.project.delete({
-      where: { ProjectID: projectId },
-    });
-    return { message: 'Project deleted successfully' };
-  } catch (error) {
-    console.error('Error deleting project:', error);
-    throw new Error('Error deleting project');
-  }
-};
+    return updatedProject;  
+  } catch (error) {  
+    console.error('Error updating project:', error);  
+    throw new Error('Error updating project');  
+  }  
+};  
+
+// Delete a project  
+export const deleteProject = async (projectId: string) => {  
+  try {  
+    await prisma.project.delete({ where: { ProjectID: projectId } });  
+    return { message: 'Project deleted successfully' };  
+  } catch (error) {  
+    console.error('Error deleting project:', error);  
+    throw new Error('Error deleting project');  
+  }  
+};  

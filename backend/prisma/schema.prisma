@@ -39,8 +39,8 @@ model Developer {
   DeveloperID String    @id @default(uuid()) @db.Uuid
   Name        String
   ContactInfo String
-  UserID      String?   @unique @db.Uuid 
-  User        User?     @relation(fields: [UserID], references: [UserID]) 
+  UserID      String    @unique @db.Uuid // Make UserID required
+  User        User      @relation(fields: [UserID], references: [UserID])
   Projects    Project[] @relation("DeveloperProjects")
 }
 

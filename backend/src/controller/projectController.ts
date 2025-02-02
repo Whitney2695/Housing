@@ -1,4 +1,3 @@
-// controller/projectController.ts
 import { Request, Response } from 'express';
 import { 
   createProject, 

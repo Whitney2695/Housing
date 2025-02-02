@@ -9,23 +9,29 @@ class DeveloperService {
     // Hash the password before saving it
     const hashedPassword = await bcrypt.hash(password, 10); // 10 is the salt rounds
     
-    return prisma.developer.create({
+    // First create the user and then create the developer with the user ID
+    const user = await prisma.user.create({
+      data: {
+        Name: name,
+        Email: email,
+        Password: hashedPassword, // Save the hashed password
+        Role: role as UserRole, // Explicitly cast role to UserRole enum
+      },
+    });
+
+    // Now create the developer with the user ID
+    const developer = await prisma.developer.create({
       data: {
         Name: name,
         ContactInfo: contactInfo,
-        User: {
-          create: {
-            Name: name,
-            Email: email,
-            Password: hashedPassword, // Save the hashed password
-            Role: role as UserRole, // Explicitly cast role to UserRole enum
-          },
-        },
+        UserID: user.UserID, // Link UserID from the user table
       },
       include: {
         User: true, // Include user details in the response
       },
     });
+
+    return developer; // Return the created developer object with user info
   }
 
   // ✅ Login Developer (Authenticate)
