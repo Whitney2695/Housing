@@ -1,7 +1,7 @@
 ###Create a new mortgage
 POST http://localhost:3000/api/mortgages/create
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNiYzFiNGMwLThkNDYtNGUxNC1hZGFlLTNlODhkMDM3YTNmNSIsImVtYWlsIjoid2hpdG5leUBnbWFpbC5jb20iLCJyb2xlIjoidXNlciIsImlhdCI6MTczODUwNzIzMSwiZXhwIjoxNzM4NTEwODMxfQ.xRWwY_NotB52aNh5vBRDPCSdSf3xfamDOaBrjyLzkt0
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjM2YjQ5MzdlLTYwNzYtNDZkOC04NWMyLTA1NjQ1OGM5NDFjMiIsImVtYWlsIjoid2hpdG5leWphY2tzNjg1QGdtYWlsLmNvbSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzM4NTgwNjI1LCJleHAiOjE3Mzg1ODQyMjV9.pU3k3IhUVpYUp1YKKk0sfQ6tiGkwOZ8EJ-OZDFk-jn8
 
 {
   "userId": "36b4937e-6076-46d8-85c2-056458c941c2",
@@ -25,9 +25,9 @@ Content-Type: application/json
 
 
 ###Update mortgage
-PUT http://localhost:3000/api/mortgages/{0c4c578d-024e-4256-8611-f0e8249ccaef}
+PUT http://localhost:3000/api/mortgages/{3654973b-6949-487b-ac72-5754202cad01}
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNiYzFiNGMwLThkNDYtNGUxNC1hZGFlLTNlODhkMDM3YTNmNSIsImVtYWlsIjoid2hpdG5leUBnbWFpbC5jb20iLCJyb2xlIjoidXNlciIsImlhdCI6MTczODUwNzIzMSwiZXhwIjoxNzM4NTEwODMxfQ.xRWwY_NotB52aNh5vBRDPCSdSf3xfamDOaBrjyLzkt0
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjM2YjQ5MzdlLTYwNzYtNDZkOC04NWMyLTA1NjQ1OGM5NDFjMiIsImVtYWlsIjoid2hpdG5leWphY2tzNjg1QGdtYWlsLmNvbSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzM4NTgwNjI1LCJleHAiOjE3Mzg1ODQyMjV9.pU3k3IhUVpYUp1YKKk0sfQ6tiGkwOZ8EJ-OZDFk-jn8
 
 {
   "income": 6000,
@@ -38,7 +38,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNiYzFiNGMwL
 }
 
 ###Delete mortgage
-DELETE http://localhost:3000/api/mortgages/{a18f9472-695d-42ba-a71b-6cce581348ef}
+DELETE http://localhost:3000/api/mortgages/{1255e159-0f24-49fd-8278-f4de5773e043}
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImNiYzFiNGMwLThkNDYtNGUxNC1hZGFlLTNlODhkMDM3YTNmNSIsImVtYWlsIjoid2hpdG5leUBnbWFpbC5jb20iLCJyb2xlIjoidXNlciIsImlhdCI6MTczODUwNzIzMSwiZXhwIjoxNzM4NTEwODMxfQ.xRWwY_NotB52aNh5vBRDPCSdSf3xfamDOaBrjyLzkt0
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjM2YjQ5MzdlLTYwNzYtNDZkOC04NWMyLTA1NjQ1OGM5NDFjMiIsImVtYWlsIjoid2hpdG5leWphY2tzNjg1QGdtYWlsLmNvbSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzM4NTgwNjI1LCJleHAiOjE3Mzg1ODQyMjV9.pU3k3IhUVpYUp1YKKk0sfQ6tiGkwOZ8EJ-OZDFk-jn8
 

@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import axios from 'axios';
 import dotenv from 'dotenv';
+import { CustomRequest } from '../middleware/authMiddleware'; // Import CustomRequest interface for middleware
 
 // Load environment variables
 dotenv.config();
@@ -64,11 +65,10 @@ class MortgageService {
   }
 
   // Create Mortgage
-  async createMortgage(mortgageDetails: any) {
+  async createMortgage(mortgageDetails: any, req: CustomRequest = {} as CustomRequest) {
     try {
       console.log('Creating new mortgage...');
 
-      // Check if the user already has a mortgage for the same project
       const existingMortgage = await prisma.mortgage.findFirst({
         where: {
           UserID: mortgageDetails.userId,
@@ -77,9 +77,7 @@ class MortgageService {
       });
 
       if (existingMortgage) {
-        const errorMessage = 'Mortgage exists for this user and project';
-        console.error(errorMessage);
-        throw new Error(errorMessage); // Throw the error to be caught in the catch block
+        throw new Error('Mortgage exists for this user and project');
       }
 
       let interestRate = mortgageDetails.interestRate;
@@ -90,9 +88,7 @@ class MortgageService {
         });
 
         if (!project) {
-          const errorMessage = 'Project not found';
-          console.error(errorMessage);
-          throw new Error(errorMessage);
+          throw new Error('Project not found');
         }
 
         interestRate = project.InterestRate || mortgageDetails.interestRate;
@@ -122,15 +118,42 @@ class MortgageService {
       });
 
       console.log('Mortgage created successfully:', newMortgage);
+
+      // Retrieve the email
+      let userEmail = req.user?.email;
+      if (!userEmail) {
+        const user = await prisma.user.findUnique({
+          where: { UserID: mortgageDetails.userId },
+          select: { Email: true }, // FIX: Using 'Email' with the correct capitalization
+        });
+
+        if (!user || !user.Email) {
+          throw new Error('User email not found.');
+        }
+
+        userEmail = user.Email; // FIX: Using 'Email' instead of 'email'
+      }
+
+      // Send confirmation email
+      const subject = 'Mortgage Application Submitted Successfully';
+      const content = `
+        <p>Dear Customer,</p>
+        <p>Your mortgage application has been successfully submitted. Here are the details:</p>
+        <p><strong>Loan Amount:</strong> ${newMortgage.LoanAmount}</p>
+        <p><strong>Interest Rate:</strong> ${newMortgage.InterestRate}%</p>
+        <p><strong>Monthly Payment:</strong> ${newMortgage.MonthlyPayment}</p>
+        <p><strong>Total Payment:</strong> ${newMortgage.TotalPayment}</p>
+        <p><strong>Total Interest:</strong> ${newMortgage.TotalInterest}</p>
+        <p>Thank you for choosing Haven Builders!</p>
+        <img src="${this.logoUrl}" alt="${this.companyName} Logo" />
+      `;
+
+      await this.sendEmail(userEmail, subject, content);
+
       return newMortgage;
     } catch (error: any) {
-      // Log the error to the console
       console.error('Error creating mortgage:', error.message);
-
-      // Return the error message in the response
-      throw {
-        error: error.message || error,
-      };
+      throw { error: error.message || error };
     }
   }
 
@@ -155,7 +178,6 @@ class MortgageService {
       const existingMortgage = await prisma.mortgage.findUnique({ where: { MortgageID: mortgageId } });
 
       if (!existingMortgage) {
-        console.error('Mortgage not found.');
         throw new Error('Mortgage not found');
       }
 
@@ -163,7 +185,6 @@ class MortgageService {
       if (mortgageDetails.projectId) {
         const project = await prisma.project.findUnique({ where: { ProjectID: mortgageDetails.projectId } });
         if (!project) {
-          console.error('Project not found.');
           throw new Error('Project not found');
         }
         interestRate = project.InterestRate;
@@ -189,35 +210,12 @@ class MortgageService {
         },
       });
 
-      console.log('Mortgage updated successfully:', updatedMortgage);
-
-      // Send email after successful update
-      const subject = 'Your Mortgage Details Have Been Updated';
-      const content = `
-        <p>Dear Customer,</p>
-        <p>Your mortgage details have been successfully updated. Here are your new mortgage details:</p>
-        <p><strong>Loan Amount:</strong> ${updatedMortgage.LoanAmount}</p>
-        <p><strong>Interest Rate:</strong> ${updatedMortgage.InterestRate}%</p>
-        <p><strong>Monthly Payment:</strong> ${updatedMortgage.MonthlyPayment}</p>
-        <p><strong>Total Payment:</strong> ${updatedMortgage.TotalPayment}</p>
-        <p><strong>Total Interest:</strong> ${updatedMortgage.TotalInterest}</p>
-        <p>If you have any questions, please contact us at support@havenbuilders.com.</p>
-        <p>Thank you for choosing Haven Builders!</p>
-        <img src="${this.logoUrl}" alt="${this.companyName} Logo" />
-      `;
-
-      // Send the email to a static address (e.g., support or admin email)
-      const staticEmail = 'support@havenbuilders.com'; // Replace with your desired email address
-      await this.sendEmail(staticEmail, subject, content);
+      console.log('Mortgage updated successfully.');
 
       return updatedMortgage;
     } catch (error: any) {
       console.error('Error updating mortgage:', error.message);
-      throw {
-        status: 500,
-        message: 'Error updating mortgage',
-        error: error.message || error,
-      };
+      throw { error: error.message || error };
     }
   }
 
@@ -226,15 +224,11 @@ class MortgageService {
     try {
       console.log(`Deleting mortgage with ID: ${mortgageId}...`);
       const deletedMortgage = await prisma.mortgage.delete({ where: { MortgageID: mortgageId } });
-      console.log('Mortgage deleted successfully:', deletedMortgage);
+      console.log('Mortgage deleted successfully.');
       return deletedMortgage;
     } catch (error: any) {
       console.error('Error deleting mortgage:', error.message);
-      throw {
-        status: 500,
-        message: 'Error deleting mortgage',
-        error: error.message || error,
-      };
+      throw { error: error.message || error };
     }
   }
 }

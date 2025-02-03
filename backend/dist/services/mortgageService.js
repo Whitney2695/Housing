@@ -67,11 +67,11 @@ class MortgageService {
         });
     }
     // Create Mortgage
-    createMortgage(mortgageDetails) {
-        return __awaiter(this, void 0, void 0, function* () {
+    createMortgage(mortgageDetails_1) {
+        return __awaiter(this, arguments, void 0, function* (mortgageDetails, req = {}) {
+            var _a;
             try {
                 console.log('Creating new mortgage...');
-                // Check if the user already has a mortgage for the same project
                 const existingMortgage = yield prisma.mortgage.findFirst({
                     where: {
                         UserID: mortgageDetails.userId,
@@ -79,9 +79,7 @@ class MortgageService {
                     },
                 });
                 if (existingMortgage) {
-                    const errorMessage = 'Mortgage exists for this user and project';
-                    console.error(errorMessage);
-                    throw new Error(errorMessage); // Throw the error to be caught in the catch block
+                    throw new Error('Mortgage exists for this user and project');
                 }
                 let interestRate = mortgageDetails.interestRate;
                 if (mortgageDetails.projectId) {
@@ -89,9 +87,7 @@ class MortgageService {
                         where: { ProjectID: mortgageDetails.projectId },
                     });
                     if (!project) {
-                        const errorMessage = 'Project not found';
-                        console.error(errorMessage);
-                        throw new Error(errorMessage);
+                        throw new Error('Project not found');
                     }
                     interestRate = project.InterestRate || mortgageDetails.interestRate;
                 }
@@ -113,15 +109,37 @@ class MortgageService {
                     },
                 });
                 console.log('Mortgage created successfully:', newMortgage);
+                // Retrieve the email
+                let userEmail = (_a = req.user) === null || _a === void 0 ? void 0 : _a.email;
+                if (!userEmail) {
+                    const user = yield prisma.user.findUnique({
+                        where: { UserID: mortgageDetails.userId },
+                        select: { Email: true }, // FIX: Using 'Email' with the correct capitalization
+                    });
+                    if (!user || !user.Email) {
+                        throw new Error('User email not found.');
+                    }
+                    userEmail = user.Email; // FIX: Using 'Email' instead of 'email'
+                }
+                // Send confirmation email
+                const subject = 'Mortgage Application Submitted Successfully';
+                const content = `
+        <p>Dear Customer,</p>
+        <p>Your mortgage application has been successfully submitted. Here are the details:</p>
+        <p><strong>Loan Amount:</strong> ${newMortgage.LoanAmount}</p>
+        <p><strong>Interest Rate:</strong> ${newMortgage.InterestRate}%</p>
+        <p><strong>Monthly Payment:</strong> ${newMortgage.MonthlyPayment}</p>
+        <p><strong>Total Payment:</strong> ${newMortgage.TotalPayment}</p>
+        <p><strong>Total Interest:</strong> ${newMortgage.TotalInterest}</p>
+        <p>Thank you for choosing Haven Builders!</p>
+        <img src="${this.logoUrl}" alt="${this.companyName} Logo" />
+      `;
+                yield this.sendEmail(userEmail, subject, content);
                 return newMortgage;
             }
             catch (error) {
-                // Log the error to the console
                 console.error('Error creating mortgage:', error.message);
-                // Return the error message in the response
-                throw {
-                    error: error.message || error,
-                };
+                throw { error: error.message || error };
             }
         });
     }
@@ -149,14 +167,12 @@ class MortgageService {
                 console.log(`Updating mortgage with ID: ${mortgageId}...`);
                 const existingMortgage = yield prisma.mortgage.findUnique({ where: { MortgageID: mortgageId } });
                 if (!existingMortgage) {
-                    console.error('Mortgage not found.');
                     throw new Error('Mortgage not found');
                 }
                 let interestRate = mortgageDetails.interestRate;
                 if (mortgageDetails.projectId) {
                     const project = yield prisma.project.findUnique({ where: { ProjectID: mortgageDetails.projectId } });
                     if (!project) {
-                        console.error('Project not found.');
                         throw new Error('Project not found');
                     }
                     interestRate = project.InterestRate;
@@ -175,33 +191,12 @@ class MortgageService {
                         CreditScore: mortgageDetails.creditScore,
                     },
                 });
-                console.log('Mortgage updated successfully:', updatedMortgage);
-                // Send email after successful update
-                const subject = 'Your Mortgage Details Have Been Updated';
-                const content = `
-        <p>Dear Customer,</p>
-        <p>Your mortgage details have been successfully updated. Here are your new mortgage details:</p>
-        <p><strong>Loan Amount:</strong> ${updatedMortgage.LoanAmount}</p>
-        <p><strong>Interest Rate:</strong> ${updatedMortgage.InterestRate}%</p>
-        <p><strong>Monthly Payment:</strong> ${updatedMortgage.MonthlyPayment}</p>
-        <p><strong>Total Payment:</strong> ${updatedMortgage.TotalPayment}</p>
-        <p><strong>Total Interest:</strong> ${updatedMortgage.TotalInterest}</p>
-        <p>If you have any questions, please contact us at support@havenbuilders.com.</p>
-        <p>Thank you for choosing Haven Builders!</p>
-        <img src="${this.logoUrl}" alt="${this.companyName} Logo" />
-      `;
-                // Send the email to a static address (e.g., support or admin email)
-                const staticEmail = 'support@havenbuilders.com'; // Replace with your desired email address
-                yield this.sendEmail(staticEmail, subject, content);
+                console.log('Mortgage updated successfully.');
                 return updatedMortgage;
             }
             catch (error) {
                 console.error('Error updating mortgage:', error.message);
-                throw {
-                    status: 500,
-                    message: 'Error updating mortgage',
-                    error: error.message || error,
-                };
+                throw { error: error.message || error };
             }
         });
     }
@@ -211,16 +206,12 @@ class MortgageService {
             try {
                 console.log(`Deleting mortgage with ID: ${mortgageId}...`);
                 const deletedMortgage = yield prisma.mortgage.delete({ where: { MortgageID: mortgageId } });
-                console.log('Mortgage deleted successfully:', deletedMortgage);
+                console.log('Mortgage deleted successfully.');
                 return deletedMortgage;
             }
             catch (error) {
                 console.error('Error deleting mortgage:', error.message);
-                throw {
-                    status: 500,
-                    message: 'Error deleting mortgage',
-                    error: error.message || error,
-                };
+                throw { error: error.message || error };
             }
         });
     }
