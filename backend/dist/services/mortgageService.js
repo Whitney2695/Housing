@@ -126,35 +126,35 @@ class MortgageService {
                 // Send confirmation email
                 const subject = 'Mortgage Application Submitted Successfully';
                 const content = `
-      <div style="font-family: Arial, sans-serif; color: #333;">
-        <h2 style="color: #2C3E50;">Dear ${userName},</h2>
-        <p>Your mortgage application has been successfully submitted. Here are the details:</p>
-        <table style="border-collapse: collapse; width: 100%; margin-top: 20px;">
-          <tr>
-            <td style="padding: 8px; border: 1px solid #ddd; background-color: #f4f4f4;"><strong>Loan Amount:</strong></td>
-            <td style="padding: 8px; border: 1px solid #ddd;">${newMortgage.LoanAmount}</td>
-          </tr>
-          <tr>
-            <td style="padding: 8px; border: 1px solid #ddd; background-color: #f4f4f4;"><strong>Interest Rate:</strong></td>
-            <td style="padding: 8px; border: 1px solid #ddd;">${newMortgage.InterestRate}%</td>
-          </tr>
-          <tr>
-            <td style="padding: 8px; border: 1px solid #ddd; background-color: #f4f4f4;"><strong>Monthly Payment:</strong></td>
-            <td style="padding: 8px; border: 1px solid #ddd;">${newMortgage.MonthlyPayment}</td>
-          </tr>
-          <tr>
-            <td style="padding: 8px; border: 1px solid #ddd; background-color: #f4f4f4;"><strong>Total Payment:</strong></td>
-            <td style="padding: 8px; border: 1px solid #ddd;">${newMortgage.TotalPayment}</td>
-          </tr>
-          <tr>
-            <td style="padding: 8px; border: 1px solid #ddd; background-color: #f4f4f4;"><strong>Total Interest:</strong></td>
-            <td style="padding: 8px; border: 1px solid #ddd;">${newMortgage.TotalInterest}</td>
-          </tr>
-        </table>
-        <p style="margin-top: 20px;">Thank you for choosing <strong>${this.companyName}</strong>!</p>
-        <img src="${this.logoUrl}" alt="${this.companyName} Logo" style="width: 150px; margin-top: 20px;" />
-      </div>
-    `;
+        <div style="font-family: Arial, sans-serif; color: #333;">
+          <h2 style="color: #2C3E50;">Dear ${userName},</h2>
+          <p>Your mortgage application has been successfully submitted. Here are the details:</p>
+          <table style="border-collapse: collapse; width: 100%; margin-top: 20px;">
+            <tr>
+              <td style="padding: 8px; border: 1px solid #ddd; background-color: #f4f4f4;"><strong>Loan Amount:</strong></td>
+              <td style="padding: 8px; border: 1px solid #ddd;">${newMortgage.LoanAmount}</td>
+            </tr>
+            <tr>
+              <td style="padding: 8px; border: 1px solid #ddd; background-color: #f4f4f4;"><strong>Interest Rate:</strong></td>
+              <td style="padding: 8px; border: 1px solid #ddd;">${newMortgage.InterestRate}%</td>
+            </tr>
+            <tr>
+              <td style="padding: 8px; border: 1px solid #ddd; background-color: #f4f4f4;"><strong>Monthly Payment:</strong></td>
+              <td style="padding: 8px; border: 1px solid #ddd;">${newMortgage.MonthlyPayment}</td>
+            </tr>
+            <tr>
+              <td style="padding: 8px; border: 1px solid #ddd; background-color: #f4f4f4;"><strong>Total Payment:</strong></td>
+              <td style="padding: 8px; border: 1px solid #ddd;">${newMortgage.TotalPayment}</td>
+            </tr>
+            <tr>
+              <td style="padding: 8px; border: 1px solid #ddd; background-color: #f4f4f4;"><strong>Total Interest:</strong></td>
+              <td style="padding: 8px; border: 1px solid #ddd;">${newMortgage.TotalInterest}</td>
+            </tr>
+          </table>
+          <p style="margin-top: 20px;">Thank you for choosing <strong>${this.companyName}</strong>!</p>
+          <img src="${this.logoUrl}" alt="${this.companyName} Logo" style="width: 150px; margin-top: 20px;" />
+        </div>
+      `;
                 yield this.sendEmail(userEmail, subject, content);
                 return newMortgage;
             }
@@ -227,35 +227,35 @@ class MortgageService {
                 }
                 const subject = 'Mortgage Updated Successfully';
                 const content = `
-      <div style="font-family: Arial, sans-serif; color: #333;">
-        <h2 style="color: #2C3E50;">Dear ${user.Name},</h2>
-        <p>Your mortgage details have been successfully updated. Here are the updated details:</p>
-        <table style="border-collapse: collapse; width: 100%; margin-top: 20px;">
-          <tr>
-            <td style="padding: 8px; border: 1px solid #ddd; background-color: #f4f4f4;"><strong>Loan Amount:</strong></td>
-            <td style="padding: 8px; border: 1px solid #ddd;">${updatedMortgage.LoanAmount}</td>
-          </tr>
-          <tr>
-            <td style="padding: 8px; border: 1px solid #ddd; background-color: #f4f4f4;"><strong>Interest Rate:</strong></td>
-            <td style="padding: 8px; border: 1px solid #ddd;">${updatedMortgage.InterestRate}%</td>
-          </tr>
-          <tr>
-            <td style="padding: 8px; border: 1px solid #ddd; background-color: #f4f4f4;"><strong>Monthly Payment:</strong></td>
-            <td style="padding: 8px; border: 1px solid #ddd;">${updatedMortgage.MonthlyPayment}</td>
-          </tr>
-          <tr>
-            <td style="padding: 8px; border: 1px solid #ddd; background-color: #f4f4f4;"><strong>Total Payment:</strong></td>
-            <td style="padding: 8px; border: 1px solid #ddd;">${updatedMortgage.TotalPayment}</td>
-          </tr>
-          <tr>
-            <td style="padding: 8px; border: 1px solid #ddd; background-color: #f4f4f4;"><strong>Total Interest:</strong></td>
-            <td style="padding: 8px; border: 1px solid #ddd;">${updatedMortgage.TotalInterest}</td>
-          </tr>
-        </table>
-        <p style="margin-top: 20px;">Thank you for choosing <strong>${this.companyName}</strong>!</p>
-        <img src="${this.logoUrl}" alt="${this.companyName} Logo" style="width: 150px; margin-top: 20px;" />
-      </div>
-    `;
+        <div style="font-family: Arial, sans-serif; color: #333;">
+          <h2 style="color: #2C3E50;">Dear ${user.Name},</h2>
+          <p>Your mortgage details have been successfully updated. Here are the updated details:</p>
+          <table style="border-collapse: collapse; width: 100%; margin-top: 20px;">
+            <tr>
+              <td style="padding: 8px; border: 1px solid #ddd; background-color: #f4f4f4;"><strong>Loan Amount:</strong></td>
+              <td style="padding: 8px; border: 1px solid #ddd;">${updatedMortgage.LoanAmount}</td>
+            </tr>
+            <tr>
+              <td style="padding: 8px; border: 1px solid #ddd; background-color: #f4f4f4;"><strong>Interest Rate:</strong></td>
+              <td style="padding: 8px; border: 1px solid #ddd;">${updatedMortgage.InterestRate}%</td>
+            </tr>
+            <tr>
+              <td style="padding: 8px; border: 1px solid #ddd; background-color: #f4f4f4;"><strong>Monthly Payment:</strong></td>
+              <td style="padding: 8px; border: 1px solid #ddd;">${updatedMortgage.MonthlyPayment}</td>
+            </tr>
+            <tr>
+              <td style="padding: 8px; border: 1px solid #ddd; background-color: #f4f4f4;"><strong>Total Payment:</strong></td>
+              <td style="padding: 8px; border: 1px solid #ddd;">${updatedMortgage.TotalPayment}</td>
+            </tr>
+            <tr>
+              <td style="padding: 8px; border: 1px solid #ddd; background-color: #f4f4f4;"><strong>Total Interest:</strong></td>
+              <td style="padding: 8px; border: 1px solid #ddd;">${updatedMortgage.TotalInterest}</td>
+            </tr>
+          </table>
+          <p style="margin-top: 20px;">Thank you for choosing <strong>${this.companyName}</strong>!</p>
+          <img src="${this.logoUrl}" alt="${this.companyName} Logo" style="width: 150px; margin-top: 20px;" />
+        </div>
+      `;
                 yield this.sendEmail(user.Email, subject, content);
                 return updatedMortgage;
             }

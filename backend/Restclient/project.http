@@ -4,7 +4,7 @@ Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImY4ODZjODRiLWEzZWYtNDkyNC1hYzExLTllZmJkNGRlNjBmZiIsImVtYWlsIjoibWVsb0BleGFtcGxlLmNvbSIsInJvbGUiOiJkZXZlbG9wZXIiLCJpYXQiOjE3Mzg2MDkwMjcsImV4cCI6MTczODYxMjYyN30.HnsNImnfBrniF2URD1OBznfgElwLFCa-1YvE_X8t4Rc
 
 {
-  "Title": " House Project",
+  "Title": "milimani Project",
   "Description": "This is another new house project.",
   "MinCreditScore": 700,
   "InterestRate": 4.8,

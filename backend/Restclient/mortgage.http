@@ -1,16 +1,16 @@
 ###Create a new mortgage
 POST http://localhost:3000/api/mortgages/create
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjM2YjQ5MzdlLTYwNzYtNDZkOC04NWMyLTA1NjQ1OGM5NDFjMiIsImVtYWlsIjoid2hpdG5leWphY2tzNjg1QGdtYWlsLmNvbSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzM4NTgwNjI1LCJleHAiOjE3Mzg1ODQyMjV9.pU3k3IhUVpYUp1YKKk0sfQ6tiGkwOZ8EJ-OZDFk-jn8
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjcxMGIyZmE1LWM3ZjUtNGUzOC05Yzg5LWUwM2MwY2ExMmQ1YyIsImVtYWlsIjoid2hpdG5leWphY2tzNjg1QGdtYWlsLmNvbSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzM4NjEyNjQxLCJleHAiOjE3Mzg2MTYyNDF9.vCoy-KwXQye0DXyZbFYG8Ew2PHWfsbyQKu_dpNDyI5c
 
 {
-  "userId": "36b4937e-6076-46d8-85c2-056458c941c2",
+  "userId": "710b2fa5-c7f5-4e38-9c89-e03c0ca12d5c",
   "income": 5000,
   "loanAmount": 200000,
   "interestRate": 5.0,
   "loanTermYears": 30,
   "creditScore": 750,
-  "projectId": "410e105e-2f52-4eb4-8f0f-9744984aede2"
+  "projectId": "117ffd54-926c-45c6-a23c-f66c469ed456"
 }
 
 
@@ -38,9 +38,9 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjM2YjQ5MzdlL
 }
 
 ###Delete mortgage
-DELETE http://localhost:3000/api/mortgages/{8b25ece6-f84f-4fa4-944c-67eeb6ed7383}
+DELETE http://localhost:3000/api/mortgages/{26e3c89c-8128-41cb-822d-f3be43327da1}
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjM2YjQ5MzdlLTYwNzYtNDZkOC04NWMyLTA1NjQ1OGM5NDFjMiIsImVtYWlsIjoid2hpdG5leWphY2tzNjg1QGdtYWlsLmNvbSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzM4NTgwNjI1LCJleHAiOjE3Mzg1ODQyMjV9.pU3k3IhUVpYUp1YKKk0sfQ6tiGkwOZ8EJ-OZDFk-jn8
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjcxMGIyZmE1LWM3ZjUtNGUzOC05Yzg5LWUwM2MwY2ExMmQ1YyIsImVtYWlsIjoid2hpdG5leWphY2tzNjg1QGdtYWlsLmNvbSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzM4NjEyNjQxLCJleHAiOjE3Mzg2MTYyNDF9.vCoy-KwXQye0DXyZbFYG8Ew2PHWfsbyQKu_dpNDyI5c
 
 ### all mortgage for specific user
 GET http://localhost:3000/api/mortgages/user/36b4937e-6076-46d8-85c2-056458c941c2
