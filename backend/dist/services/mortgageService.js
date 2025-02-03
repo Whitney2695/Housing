@@ -142,13 +142,13 @@ class MortgageService {
               <td style="padding: 8px; border: 1px solid #ddd; background-color: #f4f4f4;"><strong>Monthly Payment:</strong></td>
               <td style="padding: 8px; border: 1px solid #ddd;">${newMortgage.MonthlyPayment}</td>
             </tr>
+                        <tr>
+              <td style="padding: 8px; border: 1px solid #ddd; background-color: #f4f4f4;"><strong>Total Interest:</strong></td>
+              <td style="padding: 8px; border: 1px solid #ddd;">${newMortgage.TotalInterest}</td>
+            </tr>
             <tr>
               <td style="padding: 8px; border: 1px solid #ddd; background-color: #f4f4f4;"><strong>Total Payment:</strong></td>
               <td style="padding: 8px; border: 1px solid #ddd;">${newMortgage.TotalPayment}</td>
-            </tr>
-            <tr>
-              <td style="padding: 8px; border: 1px solid #ddd; background-color: #f4f4f4;"><strong>Total Interest:</strong></td>
-              <td style="padding: 8px; border: 1px solid #ddd;">${newMortgage.TotalInterest}</td>
             </tr>
           </table>
           <p style="margin-top: 20px;">Thank you for choosing <strong>${this.companyName}</strong>!</p>
@@ -244,12 +244,12 @@ class MortgageService {
               <td style="padding: 8px; border: 1px solid #ddd;">${updatedMortgage.MonthlyPayment}</td>
             </tr>
             <tr>
-              <td style="padding: 8px; border: 1px solid #ddd; background-color: #f4f4f4;"><strong>Total Payment:</strong></td>
-              <td style="padding: 8px; border: 1px solid #ddd;">${updatedMortgage.TotalPayment}</td>
-            </tr>
-            <tr>
               <td style="padding: 8px; border: 1px solid #ddd; background-color: #f4f4f4;"><strong>Total Interest:</strong></td>
               <td style="padding: 8px; border: 1px solid #ddd;">${updatedMortgage.TotalInterest}</td>
+            </tr>
+            <tr>
+              <td style="padding: 8px; border: 1px solid #ddd; background-color: #f4f4f4;"><strong>Total Payment:</strong></td>
+              <td style="padding: 8px; border: 1px solid #ddd;">${updatedMortgage.TotalPayment}</td>
             </tr>
           </table>
           <p style="margin-top: 20px;">Thank you for choosing <strong>${this.companyName}</strong>!</p>
