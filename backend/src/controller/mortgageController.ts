@@ -68,3 +68,17 @@ export const deleteMortgageController = async (req: Request, res: Response): Pro
     res.status(500).json({ message: 'Error deleting mortgage', error });
   }
 };
+
+// Get Mortgages for a Specific User Controller
+export const getMortgagesByUserController = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const userId = req.params.userId;
+    const mortgages = await mortgageService.getMortgagesByUser(userId);
+
+    res.status(200).json(mortgages);
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching user mortgages', error });
+  }
+};
+
+

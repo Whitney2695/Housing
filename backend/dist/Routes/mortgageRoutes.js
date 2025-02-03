@@ -13,4 +13,5 @@ router.get('/', mortgageController_1.getAllMortgagesController); // Added route 
 router.get('/:id', mortgageController_1.getMortgageByIdController);
 router.put('/:id', authMiddleware_1.default.authenticate, mortgageController_1.updateMortgageController);
 router.delete('/:id', authMiddleware_1.default.authenticate, mortgageController_1.deleteMortgageController);
+router.get('/user/:userId', authMiddleware_1.default.authenticate, mortgageController_1.getMortgagesByUserController);
 exports.default = router;

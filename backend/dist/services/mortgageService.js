@@ -280,5 +280,24 @@ class MortgageService {
             }
         });
     }
+    // Get Mortgages for a Specific User
+    getMortgagesByUser(userId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                console.log(`Fetching mortgages for user ID: ${userId}...`);
+                const mortgages = yield prisma.mortgage.findMany({
+                    where: { UserID: userId },
+                });
+                if (!mortgages.length) {
+                    throw new Error('No mortgages found for this user.');
+                }
+                return mortgages;
+            }
+            catch (error) {
+                console.error('Error fetching user mortgages:', error.message);
+                throw { error: error.message || error };
+            }
+        });
+    }
 }
 exports.default = new MortgageService();

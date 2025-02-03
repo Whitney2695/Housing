@@ -12,7 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.deleteMortgageController = exports.updateMortgageController = exports.getAllMortgagesController = exports.getMortgageByIdController = exports.createMortgageController = void 0;
+exports.getMortgagesByUserController = exports.deleteMortgageController = exports.updateMortgageController = exports.getAllMortgagesController = exports.getMortgageByIdController = exports.createMortgageController = void 0;
 const mortgageService_1 = __importDefault(require("../services/mortgageService"));
 // Create Mortgage Controller
 const createMortgageController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -81,3 +81,15 @@ const deleteMortgageController = (req, res) => __awaiter(void 0, void 0, void 0,
     }
 });
 exports.deleteMortgageController = deleteMortgageController;
+// Get Mortgages for a Specific User Controller
+const getMortgagesByUserController = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const userId = req.params.userId;
+        const mortgages = yield mortgageService_1.default.getMortgagesByUser(userId);
+        res.status(200).json(mortgages);
+    }
+    catch (error) {
+        res.status(500).json({ message: 'Error fetching user mortgages', error });
+    }
+});
+exports.getMortgagesByUserController = getMortgagesByUserController;

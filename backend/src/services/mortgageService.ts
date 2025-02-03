@@ -302,6 +302,26 @@ async updateMortgage(mortgageId: string, mortgageDetails: any) {
       throw { error: error.message || error };
     }
   }
+
+  // Get Mortgages for a Specific User
+async getMortgagesByUser(userId: string) {
+  try {
+    console.log(`Fetching mortgages for user ID: ${userId}...`);
+    const mortgages = await prisma.mortgage.findMany({
+      where: { UserID: userId },
+    });
+
+    if (!mortgages.length) {
+      throw new Error('No mortgages found for this user.');
+    }
+
+    return mortgages;
+  } catch (error: any) {
+    console.error('Error fetching user mortgages:', error.message);
+    throw { error: error.message || error };
+  }
+}
+
 }
 
 
