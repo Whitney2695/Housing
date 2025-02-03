@@ -25,20 +25,20 @@ Content-Type: application/json
 
 
 ###Update mortgage
-PUT http://localhost:3000/api/mortgages/{3654973b-6949-487b-ac72-5754202cad01}
+PUT http://localhost:3000/api/mortgages/{8b25ece6-f84f-4fa4-944c-67eeb6ed7383}
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjM2YjQ5MzdlLTYwNzYtNDZkOC04NWMyLTA1NjQ1OGM5NDFjMiIsImVtYWlsIjoid2hpdG5leWphY2tzNjg1QGdtYWlsLmNvbSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzM4NTgwNjI1LCJleHAiOjE3Mzg1ODQyMjV9.pU3k3IhUVpYUp1YKKk0sfQ6tiGkwOZ8EJ-OZDFk-jn8
 
 {
   "income": 6000,
-  "loanAmount": 250000,
+  "loanAmount": 254000,
   "interestRate": 4.5,
   "loanTermYears": 25,
   "creditScore": 800
 }
 
 ###Delete mortgage
-DELETE http://localhost:3000/api/mortgages/{1255e159-0f24-49fd-8278-f4de5773e043}
+DELETE http://localhost:3000/api/mortgages/{8b25ece6-f84f-4fa4-944c-67eeb6ed7383}
 Content-Type: application/json
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjM2YjQ5MzdlLTYwNzYtNDZkOC04NWMyLTA1NjQ1OGM5NDFjMiIsImVtYWlsIjoid2hpdG5leWphY2tzNjg1QGdtYWlsLmNvbSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzM4NTgwNjI1LCJleHAiOjE3Mzg1ODQyMjV9.pU3k3IhUVpYUp1YKKk0sfQ6tiGkwOZ8EJ-OZDFk-jn8
 

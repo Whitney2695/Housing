@@ -65,97 +65,120 @@ class MortgageService {
   }
 
   // Create Mortgage
-  async createMortgage(mortgageDetails: any, req: CustomRequest = {} as CustomRequest) {
-    try {
-      console.log('Creating new mortgage...');
+async createMortgage(mortgageDetails: any, req: CustomRequest = {} as CustomRequest) {
+  try {
+    console.log('Creating new mortgage...');
 
-      const existingMortgage = await prisma.mortgage.findFirst({
-        where: {
-          UserID: mortgageDetails.userId,
-          projectId: mortgageDetails.projectId || null,
-        },
-      });
+    const existingMortgage = await prisma.mortgage.findFirst({
+      where: {
+        UserID: mortgageDetails.userId,
+        projectId: mortgageDetails.projectId || null,
+      },
+    });
 
-      if (existingMortgage) {
-        throw new Error('Mortgage exists for this user and project');
-      }
-
-      let interestRate = mortgageDetails.interestRate;
-
-      if (mortgageDetails.projectId) {
-        const project = await prisma.project.findUnique({
-          where: { ProjectID: mortgageDetails.projectId },
-        });
-
-        if (!project) {
-          throw new Error('Project not found');
-        }
-
-        interestRate = project.InterestRate || mortgageDetails.interestRate;
-      }
-
-      const { monthlyPayment, totalPayment, totalInterest } = this.calculateMortgage(
-        mortgageDetails.loanAmount,
-        interestRate,
-        mortgageDetails.loanTermYears
-      );
-
-      const newMortgage = await prisma.mortgage.create({
-        data: {
-          UserID: mortgageDetails.userId,
-          Income: mortgageDetails.income,
-          LoanAmount: mortgageDetails.loanAmount,
-          InterestRate: interestRate,
-          LoanTermYears: mortgageDetails.loanTermYears,
-          MonthlyPayment: monthlyPayment,
-          TotalPayment: totalPayment,
-          TotalInterest: totalInterest,
-          CreditScore: mortgageDetails.creditScore,
-          IsEligible: true,
-          CalculatedAt: new Date(),
-          projectId: mortgageDetails.projectId || null,
-        },
-      });
-
-      console.log('Mortgage created successfully:', newMortgage);
-
-      // Retrieve the email
-      let userEmail = req.user?.email;
-      if (!userEmail) {
-        const user = await prisma.user.findUnique({
-          where: { UserID: mortgageDetails.userId },
-          select: { Email: true }, // FIX: Using 'Email' with the correct capitalization
-        });
-
-        if (!user || !user.Email) {
-          throw new Error('User email not found.');
-        }
-
-        userEmail = user.Email; // FIX: Using 'Email' instead of 'email'
-      }
-
-      // Send confirmation email
-      const subject = 'Mortgage Application Submitted Successfully';
-      const content = `
-        <p>Dear Customer,</p>
-        <p>Your mortgage application has been successfully submitted. Here are the details:</p>
-        <p><strong>Loan Amount:</strong> ${newMortgage.LoanAmount}</p>
-        <p><strong>Interest Rate:</strong> ${newMortgage.InterestRate}%</p>
-        <p><strong>Monthly Payment:</strong> ${newMortgage.MonthlyPayment}</p>
-        <p><strong>Total Payment:</strong> ${newMortgage.TotalPayment}</p>
-        <p><strong>Total Interest:</strong> ${newMortgage.TotalInterest}</p>
-        <p>Thank you for choosing Haven Builders!</p>
-        <img src="${this.logoUrl}" alt="${this.companyName} Logo" />
-      `;
-
-      await this.sendEmail(userEmail, subject, content);
-
-      return newMortgage;
-    } catch (error: any) {
-      console.error('Error creating mortgage:', error.message);
-      throw { error: error.message || error };
+    if (existingMortgage) {
+      throw new Error('Mortgage exists for this user and project');
     }
+
+    let interestRate = mortgageDetails.interestRate;
+
+    if (mortgageDetails.projectId) {
+      const project = await prisma.project.findUnique({
+        where: { ProjectID: mortgageDetails.projectId },
+      });
+
+      if (!project) {
+        throw new Error('Project not found');
+      }
+
+      interestRate = project.InterestRate || mortgageDetails.interestRate;
+    }
+
+    const { monthlyPayment, totalPayment, totalInterest } = this.calculateMortgage(
+      mortgageDetails.loanAmount,
+      interestRate,
+      mortgageDetails.loanTermYears
+    );
+
+    const newMortgage = await prisma.mortgage.create({
+      data: {
+        UserID: mortgageDetails.userId,
+        Income: mortgageDetails.income,
+        LoanAmount: mortgageDetails.loanAmount,
+        InterestRate: interestRate,
+        LoanTermYears: mortgageDetails.loanTermYears,
+        MonthlyPayment: monthlyPayment,
+        TotalPayment: totalPayment,
+        TotalInterest: totalInterest,
+        CreditScore: mortgageDetails.creditScore,
+        IsEligible: true,
+        CalculatedAt: new Date(),
+        projectId: mortgageDetails.projectId || null,
+      },
+    });
+
+    console.log('Mortgage created successfully:', newMortgage);
+
+    // Retrieve the email and name
+    let userEmail = req.user?.email;
+    let userName = req.user?.name;
+
+    if (!userEmail || !userName) {
+      const user = await prisma.user.findUnique({
+        where: { UserID: mortgageDetails.userId },
+        select: { Email: true, Name: true },
+      });
+
+      if (!user || !user.Email || !user.Name) {
+        throw new Error('User email or name not found.');
+      }
+
+      userEmail = user.Email;
+      userName = user.Name;
+    }
+
+    // Send confirmation email
+    const subject = 'Mortgage Application Submitted Successfully';
+    const content = `
+      <div style="font-family: Arial, sans-serif; color: #333;">
+        <h2 style="color: #2C3E50;">Dear ${userName},</h2>
+        <p>Your mortgage application has been successfully submitted. Here are the details:</p>
+        <table style="border-collapse: collapse; width: 100%; margin-top: 20px;">
+          <tr>
+            <td style="padding: 8px; border: 1px solid #ddd; background-color: #f4f4f4;"><strong>Loan Amount:</strong></td>
+            <td style="padding: 8px; border: 1px solid #ddd;">${newMortgage.LoanAmount}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px; border: 1px solid #ddd; background-color: #f4f4f4;"><strong>Interest Rate:</strong></td>
+            <td style="padding: 8px; border: 1px solid #ddd;">${newMortgage.InterestRate}%</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px; border: 1px solid #ddd; background-color: #f4f4f4;"><strong>Monthly Payment:</strong></td>
+            <td style="padding: 8px; border: 1px solid #ddd;">${newMortgage.MonthlyPayment}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px; border: 1px solid #ddd; background-color: #f4f4f4;"><strong>Total Payment:</strong></td>
+            <td style="padding: 8px; border: 1px solid #ddd;">${newMortgage.TotalPayment}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px; border: 1px solid #ddd; background-color: #f4f4f4;"><strong>Total Interest:</strong></td>
+            <td style="padding: 8px; border: 1px solid #ddd;">${newMortgage.TotalInterest}</td>
+          </tr>
+        </table>
+        <p style="margin-top: 20px;">Thank you for choosing <strong>${this.companyName}</strong>!</p>
+        <img src="${this.logoUrl}" alt="${this.companyName} Logo" style="width: 150px; margin-top: 20px;" />
+      </div>
+    `;
+
+    await this.sendEmail(userEmail, subject, content);
+
+    return newMortgage;
+  } catch (error: any) {
+    console.error('Error creating mortgage:', error.message);
+    throw { error: error.message || error };
   }
+}
+
 
   // Get Mortgage by ID
   async getMortgageById(mortgageId: string) {
@@ -171,53 +194,101 @@ class MortgageService {
     return await prisma.mortgage.findMany();
   }
 
-  // Update Mortgage
-  async updateMortgage(mortgageId: string, mortgageDetails: any) {
-    try {
-      console.log(`Updating mortgage with ID: ${mortgageId}...`);
-      const existingMortgage = await prisma.mortgage.findUnique({ where: { MortgageID: mortgageId } });
+// Update Mortgage
+async updateMortgage(mortgageId: string, mortgageDetails: any) {
+  try {
+    console.log(`Updating mortgage with ID: ${mortgageId}...`);
+    const existingMortgage = await prisma.mortgage.findUnique({
+      where: { MortgageID: mortgageId },
+    });
 
-      if (!existingMortgage) {
-        throw new Error('Mortgage not found');
-      }
-
-      let interestRate = mortgageDetails.interestRate;
-      if (mortgageDetails.projectId) {
-        const project = await prisma.project.findUnique({ where: { ProjectID: mortgageDetails.projectId } });
-        if (!project) {
-          throw new Error('Project not found');
-        }
-        interestRate = project.InterestRate;
-      }
-
-      const { monthlyPayment, totalPayment, totalInterest } = this.calculateMortgage(
-        mortgageDetails.loanAmount,
-        interestRate,
-        mortgageDetails.loanTermYears
-      );
-
-      const updatedMortgage = await prisma.mortgage.update({
-        where: { MortgageID: mortgageId },
-        data: {
-          Income: mortgageDetails.income,
-          LoanAmount: mortgageDetails.loanAmount,
-          InterestRate: interestRate,
-          LoanTermYears: mortgageDetails.loanTermYears,
-          MonthlyPayment: monthlyPayment,
-          TotalPayment: totalPayment,
-          TotalInterest: totalInterest,
-          CreditScore: mortgageDetails.creditScore,
-        },
-      });
-
-      console.log('Mortgage updated successfully.');
-
-      return updatedMortgage;
-    } catch (error: any) {
-      console.error('Error updating mortgage:', error.message);
-      throw { error: error.message || error };
+    if (!existingMortgage) {
+      throw new Error('Mortgage not found');
     }
+
+    let interestRate = mortgageDetails.interestRate;
+    if (mortgageDetails.projectId) {
+      const project = await prisma.project.findUnique({
+        where: { ProjectID: mortgageDetails.projectId },
+      });
+      if (!project) {
+        throw new Error('Project not found');
+      }
+      interestRate = project.InterestRate;
+    }
+
+    const { monthlyPayment, totalPayment, totalInterest } = this.calculateMortgage(
+      mortgageDetails.loanAmount,
+      interestRate,
+      mortgageDetails.loanTermYears
+    );
+
+    const updatedMortgage = await prisma.mortgage.update({
+      where: { MortgageID: mortgageId },
+      data: {
+        Income: mortgageDetails.income,
+        LoanAmount: mortgageDetails.loanAmount,
+        InterestRate: interestRate,
+        LoanTermYears: mortgageDetails.loanTermYears,
+        MonthlyPayment: monthlyPayment,
+        TotalPayment: totalPayment,
+        TotalInterest: totalInterest,
+        CreditScore: mortgageDetails.creditScore,
+      },
+    });
+
+    console.log('Mortgage updated successfully.');
+
+    // Retrieve the email and name of the user
+    const user = await prisma.user.findUnique({
+      where: { UserID: existingMortgage.UserID },
+      select: { Email: true, Name: true },
+    });
+
+    if (!user || !user.Email || !user.Name) {
+      throw new Error('User email or name not found.');
+    }
+
+    const subject = 'Mortgage Updated Successfully';
+    const content = `
+      <div style="font-family: Arial, sans-serif; color: #333;">
+        <h2 style="color: #2C3E50;">Dear ${user.Name},</h2>
+        <p>Your mortgage details have been successfully updated. Here are the updated details:</p>
+        <table style="border-collapse: collapse; width: 100%; margin-top: 20px;">
+          <tr>
+            <td style="padding: 8px; border: 1px solid #ddd; background-color: #f4f4f4;"><strong>Loan Amount:</strong></td>
+            <td style="padding: 8px; border: 1px solid #ddd;">${updatedMortgage.LoanAmount}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px; border: 1px solid #ddd; background-color: #f4f4f4;"><strong>Interest Rate:</strong></td>
+            <td style="padding: 8px; border: 1px solid #ddd;">${updatedMortgage.InterestRate}%</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px; border: 1px solid #ddd; background-color: #f4f4f4;"><strong>Monthly Payment:</strong></td>
+            <td style="padding: 8px; border: 1px solid #ddd;">${updatedMortgage.MonthlyPayment}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px; border: 1px solid #ddd; background-color: #f4f4f4;"><strong>Total Payment:</strong></td>
+            <td style="padding: 8px; border: 1px solid #ddd;">${updatedMortgage.TotalPayment}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px; border: 1px solid #ddd; background-color: #f4f4f4;"><strong>Total Interest:</strong></td>
+            <td style="padding: 8px; border: 1px solid #ddd;">${updatedMortgage.TotalInterest}</td>
+          </tr>
+        </table>
+        <p style="margin-top: 20px;">Thank you for choosing <strong>${this.companyName}</strong>!</p>
+        <img src="${this.logoUrl}" alt="${this.companyName} Logo" style="width: 150px; margin-top: 20px;" />
+      </div>
+    `;
+    
+    await this.sendEmail(user.Email, subject, content);
+
+    return updatedMortgage;
+  } catch (error: any) {
+    console.error('Error updating mortgage:', error.message);
+    throw { error: error.message || error };
   }
+}
 
   // Delete Mortgage
   async deleteMortgage(mortgageId: string) {
@@ -232,5 +303,7 @@ class MortgageService {
     }
   }
 }
+
+
 
 export default new MortgageService();

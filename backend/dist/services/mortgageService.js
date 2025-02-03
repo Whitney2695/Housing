@@ -69,7 +69,7 @@ class MortgageService {
     // Create Mortgage
     createMortgage(mortgageDetails_1) {
         return __awaiter(this, arguments, void 0, function* (mortgageDetails, req = {}) {
-            var _a;
+            var _a, _b;
             try {
                 console.log('Creating new mortgage...');
                 const existingMortgage = yield prisma.mortgage.findFirst({
@@ -109,31 +109,52 @@ class MortgageService {
                     },
                 });
                 console.log('Mortgage created successfully:', newMortgage);
-                // Retrieve the email
+                // Retrieve the email and name
                 let userEmail = (_a = req.user) === null || _a === void 0 ? void 0 : _a.email;
-                if (!userEmail) {
+                let userName = (_b = req.user) === null || _b === void 0 ? void 0 : _b.name;
+                if (!userEmail || !userName) {
                     const user = yield prisma.user.findUnique({
                         where: { UserID: mortgageDetails.userId },
-                        select: { Email: true }, // FIX: Using 'Email' with the correct capitalization
+                        select: { Email: true, Name: true },
                     });
-                    if (!user || !user.Email) {
-                        throw new Error('User email not found.');
+                    if (!user || !user.Email || !user.Name) {
+                        throw new Error('User email or name not found.');
                     }
-                    userEmail = user.Email; // FIX: Using 'Email' instead of 'email'
+                    userEmail = user.Email;
+                    userName = user.Name;
                 }
                 // Send confirmation email
                 const subject = 'Mortgage Application Submitted Successfully';
                 const content = `
-        <p>Dear Customer,</p>
+      <div style="font-family: Arial, sans-serif; color: #333;">
+        <h2 style="color: #2C3E50;">Dear ${userName},</h2>
         <p>Your mortgage application has been successfully submitted. Here are the details:</p>
-        <p><strong>Loan Amount:</strong> ${newMortgage.LoanAmount}</p>
-        <p><strong>Interest Rate:</strong> ${newMortgage.InterestRate}%</p>
-        <p><strong>Monthly Payment:</strong> ${newMortgage.MonthlyPayment}</p>
-        <p><strong>Total Payment:</strong> ${newMortgage.TotalPayment}</p>
-        <p><strong>Total Interest:</strong> ${newMortgage.TotalInterest}</p>
-        <p>Thank you for choosing Haven Builders!</p>
-        <img src="${this.logoUrl}" alt="${this.companyName} Logo" />
-      `;
+        <table style="border-collapse: collapse; width: 100%; margin-top: 20px;">
+          <tr>
+            <td style="padding: 8px; border: 1px solid #ddd; background-color: #f4f4f4;"><strong>Loan Amount:</strong></td>
+            <td style="padding: 8px; border: 1px solid #ddd;">${newMortgage.LoanAmount}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px; border: 1px solid #ddd; background-color: #f4f4f4;"><strong>Interest Rate:</strong></td>
+            <td style="padding: 8px; border: 1px solid #ddd;">${newMortgage.InterestRate}%</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px; border: 1px solid #ddd; background-color: #f4f4f4;"><strong>Monthly Payment:</strong></td>
+            <td style="padding: 8px; border: 1px solid #ddd;">${newMortgage.MonthlyPayment}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px; border: 1px solid #ddd; background-color: #f4f4f4;"><strong>Total Payment:</strong></td>
+            <td style="padding: 8px; border: 1px solid #ddd;">${newMortgage.TotalPayment}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px; border: 1px solid #ddd; background-color: #f4f4f4;"><strong>Total Interest:</strong></td>
+            <td style="padding: 8px; border: 1px solid #ddd;">${newMortgage.TotalInterest}</td>
+          </tr>
+        </table>
+        <p style="margin-top: 20px;">Thank you for choosing <strong>${this.companyName}</strong>!</p>
+        <img src="${this.logoUrl}" alt="${this.companyName} Logo" style="width: 150px; margin-top: 20px;" />
+      </div>
+    `;
                 yield this.sendEmail(userEmail, subject, content);
                 return newMortgage;
             }
@@ -165,13 +186,17 @@ class MortgageService {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 console.log(`Updating mortgage with ID: ${mortgageId}...`);
-                const existingMortgage = yield prisma.mortgage.findUnique({ where: { MortgageID: mortgageId } });
+                const existingMortgage = yield prisma.mortgage.findUnique({
+                    where: { MortgageID: mortgageId },
+                });
                 if (!existingMortgage) {
                     throw new Error('Mortgage not found');
                 }
                 let interestRate = mortgageDetails.interestRate;
                 if (mortgageDetails.projectId) {
-                    const project = yield prisma.project.findUnique({ where: { ProjectID: mortgageDetails.projectId } });
+                    const project = yield prisma.project.findUnique({
+                        where: { ProjectID: mortgageDetails.projectId },
+                    });
                     if (!project) {
                         throw new Error('Project not found');
                     }
@@ -192,6 +217,46 @@ class MortgageService {
                     },
                 });
                 console.log('Mortgage updated successfully.');
+                // Retrieve the email and name of the user
+                const user = yield prisma.user.findUnique({
+                    where: { UserID: existingMortgage.UserID },
+                    select: { Email: true, Name: true },
+                });
+                if (!user || !user.Email || !user.Name) {
+                    throw new Error('User email or name not found.');
+                }
+                const subject = 'Mortgage Updated Successfully';
+                const content = `
+      <div style="font-family: Arial, sans-serif; color: #333;">
+        <h2 style="color: #2C3E50;">Dear ${user.Name},</h2>
+        <p>Your mortgage details have been successfully updated. Here are the updated details:</p>
+        <table style="border-collapse: collapse; width: 100%; margin-top: 20px;">
+          <tr>
+            <td style="padding: 8px; border: 1px solid #ddd; background-color: #f4f4f4;"><strong>Loan Amount:</strong></td>
+            <td style="padding: 8px; border: 1px solid #ddd;">${updatedMortgage.LoanAmount}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px; border: 1px solid #ddd; background-color: #f4f4f4;"><strong>Interest Rate:</strong></td>
+            <td style="padding: 8px; border: 1px solid #ddd;">${updatedMortgage.InterestRate}%</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px; border: 1px solid #ddd; background-color: #f4f4f4;"><strong>Monthly Payment:</strong></td>
+            <td style="padding: 8px; border: 1px solid #ddd;">${updatedMortgage.MonthlyPayment}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px; border: 1px solid #ddd; background-color: #f4f4f4;"><strong>Total Payment:</strong></td>
+            <td style="padding: 8px; border: 1px solid #ddd;">${updatedMortgage.TotalPayment}</td>
+          </tr>
+          <tr>
+            <td style="padding: 8px; border: 1px solid #ddd; background-color: #f4f4f4;"><strong>Total Interest:</strong></td>
+            <td style="padding: 8px; border: 1px solid #ddd;">${updatedMortgage.TotalInterest}</td>
+          </tr>
+        </table>
+        <p style="margin-top: 20px;">Thank you for choosing <strong>${this.companyName}</strong>!</p>
+        <img src="${this.logoUrl}" alt="${this.companyName} Logo" style="width: 150px; margin-top: 20px;" />
+      </div>
+    `;
+                yield this.sendEmail(user.Email, subject, content);
                 return updatedMortgage;
             }
             catch (error) {
