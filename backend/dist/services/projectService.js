@@ -12,15 +12,15 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.deleteProject = exports.updateProject = exports.getProjectById = exports.getProjects = exports.createProject = void 0;
 const client_1 = require("@prisma/client");
 const cloudinary_1 = require("cloudinary");
-// Initialize Prisma Client  
+// Initialize Prisma Client
 const prisma = new client_1.PrismaClient();
-// Configure Cloudinary  
+// Configure Cloudinary
 cloudinary_1.v2.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
     api_key: process.env.CLOUDINARY_API_KEY,
     api_secret: process.env.CLOUDINARY_API_SECRET,
 });
-// Function to upload an image to Cloudinary  
+// Function to upload an image to Cloudinary
 const uploadImageToCloudinary = (file) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const result = yield cloudinary_1.v2.uploader.upload(file.path, {
@@ -31,99 +31,95 @@ const uploadImageToCloudinary = (file) => __awaiter(void 0, void 0, void 0, func
     }
     catch (error) {
         console.error('Error uploading to Cloudinary:', error);
-        return null; // Return null if upload fails  
+        return null;
     }
 });
-// Create a new project  
+// ✅ Create a new project with GIS location
 const createProject = (req) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b;
+    var _a;
     try {
         console.log('Request Body:', req.body);
-        const { Title, Description, MinCreditScore, InterestRate, EligibilityCriteria, ProgressPercentage, Status, StartDate, Latitude, Longitude, } = req.body;
-        // Check if User ID and Developer ID are present in the token
-        console.log('User ID from token:', (_a = req.user) === null || _a === void 0 ? void 0 : _a.id);
-        if (!((_b = req.user) === null || _b === void 0 ? void 0 : _b.id))
+        const { Title, Description, MinCreditScore, InterestRate, EligibilityCriteria, ProgressPercentage, Status, StartDate, Price, GIS_Locations, } = req.body;
+        if (!((_a = req.user) === null || _a === void 0 ? void 0 : _a.id))
             throw new Error('Unauthorized: No User ID found in token');
-        // Check if required fields are present
-        if (!Title || !Description || !MinCreditScore || !InterestRate || !EligibilityCriteria || !ProgressPercentage || !Status || !StartDate) {
-            const missingFields = [];
-            if (!Title)
-                missingFields.push('Title');
-            if (!Description)
-                missingFields.push('Description');
-            if (!MinCreditScore)
-                missingFields.push('MinCreditScore');
-            if (!InterestRate)
-                missingFields.push('InterestRate');
-            if (!EligibilityCriteria)
-                missingFields.push('EligibilityCriteria');
-            if (!ProgressPercentage)
-                missingFields.push('ProgressPercentage');
-            if (!Status)
-                missingFields.push('Status');
-            if (!StartDate)
-                missingFields.push('StartDate');
-            console.error('Missing required fields:', missingFields.join(', '));
+        // ✅ Extract Latitude and Longitude properly
+        const Latitude = GIS_Locations === null || GIS_Locations === void 0 ? void 0 : GIS_Locations.Latitude;
+        const Longitude = GIS_Locations === null || GIS_Locations === void 0 ? void 0 : GIS_Locations.Longitude;
+        // ✅ Validate required fields
+        const missingFields = [];
+        if (!Title)
+            missingFields.push('Title');
+        if (!Description)
+            missingFields.push('Description');
+        if (!MinCreditScore)
+            missingFields.push('MinCreditScore');
+        if (!InterestRate)
+            missingFields.push('InterestRate');
+        if (!EligibilityCriteria)
+            missingFields.push('EligibilityCriteria');
+        if (!ProgressPercentage)
+            missingFields.push('ProgressPercentage');
+        if (!Status)
+            missingFields.push('Status');
+        if (!StartDate)
+            missingFields.push('StartDate');
+        if (Price === undefined)
+            missingFields.push('Price');
+        if (Latitude === undefined || Longitude === undefined)
+            missingFields.push('Latitude/Longitude');
+        if (missingFields.length > 0)
             throw new Error(`Missing required fields: ${missingFields.join(', ')}`);
-        }
+        // ✅ Find user and developer
+        const user = yield prisma.user.findUnique({ where: { UserID: req.user.id } });
+        if (!user)
+            throw new Error('User does not exist');
+        const developer = yield prisma.developer.findUnique({ where: { UserID: req.user.id } });
+        if (!developer)
+            throw new Error('Developer not found for the provided User ID');
+        // ✅ Check if a project with the same title exists
+        const existingProject = yield prisma.project.findFirst({
+            where: { Title, DeveloperID: developer.DeveloperID },
+        });
+        if (existingProject)
+            throw new Error('A project with this title already exists under the same developer');
+        // ✅ Upload image to Cloudinary (if provided)
         let imageUrl = null;
         if (req.file) {
-            console.log('Uploading image to Cloudinary...');
             imageUrl = yield uploadImageToCloudinary(req.file);
-            if (imageUrl) {
-                console.log('Image URL:', imageUrl);
-            }
-            else {
-                console.log('Image upload failed');
-            }
         }
-        // Check if the User exists in the database
-        const user = yield prisma.user.findUnique({
-            where: { UserID: req.user.id }, // Look for the user by UserID
-        });
-        if (!user) {
-            throw new Error('User does not exist');
-        }
-        // Check if the Developer associated with the User exists
-        const developer = yield prisma.developer.findUnique({
-            where: { UserID: req.user.id }, // Find Developer by the UserID associated with the token's UserID
-        });
-        if (!developer) {
-            throw new Error('Developer not found for the provided User ID');
-        }
-        console.log('Creating new project in the database...');
+        // ✅ Create the project
         const newProject = yield prisma.project.create({
             data: {
                 Title,
                 Description,
                 MinCreditScore,
                 InterestRate,
-                EligibilityCriteria: JSON.stringify(EligibilityCriteria),
+                EligibilityCriteria: EligibilityCriteria, // Store as JSON
                 ProgressPercentage,
                 Status,
                 StartDate,
+                Price,
                 ProjectImageUrl: imageUrl,
-                DeveloperID: developer.DeveloperID, // Use the DeveloperID found from the Developer model
+                DeveloperID: developer.DeveloperID,
             },
         });
-        if (Latitude && Longitude) {
-            yield prisma.gISLocation.create({
-                data: {
-                    ProjectID: newProject.ProjectID,
-                    Latitude,
-                    Longitude,
-                },
-            });
-        }
+        // ✅ Insert GIS location if provided
+        yield prisma.gISLocation.create({
+            data: {
+                ProjectID: newProject.ProjectID,
+                Latitude,
+                Longitude,
+            },
+        });
         return newProject;
     }
     catch (error) {
         console.error('Error creating project:', error);
-        throw new Error('Error creating project');
+        throw new Error(error instanceof Error ? error.message : 'Error creating project');
     }
 });
 exports.createProject = createProject;
-// Get all projects  
+// ✅ Get all projects with GIS locations
 const getProjects = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         return yield prisma.project.findMany({ include: { GIS_Locations: true } });
@@ -134,7 +130,7 @@ const getProjects = () => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 exports.getProjects = getProjects;
-// Get a specific project by ID  
+// ✅ Get a specific project by ID
 const getProjectById = (projectId) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const project = yield prisma.project.findUnique({
@@ -151,9 +147,20 @@ const getProjectById = (projectId) => __awaiter(void 0, void 0, void 0, function
     }
 });
 exports.getProjectById = getProjectById;
-// Update an existing project  
-const updateProject = (projectId, data) => __awaiter(void 0, void 0, void 0, function* () {
+// ✅ Update an existing project (with GIS location support)
+const updateProject = (projectId, data, file) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        const existingProject = yield prisma.project.findUnique({ where: { ProjectID: projectId } });
+        if (!existingProject)
+            throw new Error('Project not found');
+        // ✅ Upload new image (if provided)
+        let imageUrl = existingProject.ProjectImageUrl;
+        if (file) {
+            const uploadedUrl = yield uploadImageToCloudinary(file);
+            if (uploadedUrl)
+                imageUrl = uploadedUrl;
+        }
+        // ✅ Update the project
         const updatedProject = yield prisma.project.update({
             where: { ProjectID: projectId },
             data: {
@@ -161,41 +168,55 @@ const updateProject = (projectId, data) => __awaiter(void 0, void 0, void 0, fun
                 Description: data.Description,
                 Status: data.Status,
                 ProgressPercentage: data.ProgressPercentage,
-                EligibilityCriteria: JSON.stringify(data.EligibilityCriteria),
+                EligibilityCriteria: data.EligibilityCriteria,
                 MinCreditScore: data.MinCreditScore,
                 InterestRate: data.InterestRate,
                 StartDate: data.StartDate,
+                Price: data.Price,
+                ProjectImageUrl: imageUrl,
             },
         });
-        if (data.image) {
-            const imageUrl = yield uploadImageToCloudinary(data.image);
-            if (imageUrl) {
-                yield prisma.project.update({
-                    where: { ProjectID: projectId },
-                    data: { ProjectImageUrl: imageUrl },
-                });
-            }
-            else {
-                console.log('Image upload failed during update');
+        // ✅ Update GIS location if provided
+        if (data.GIS_Locations) {
+            const { Latitude, Longitude } = data.GIS_Locations;
+            if (Latitude !== undefined && Longitude !== undefined) {
+                const existingLocation = yield prisma.gISLocation.findFirst({ where: { ProjectID: projectId } });
+                if (existingLocation) {
+                    yield prisma.gISLocation.update({
+                        where: { GISID: existingLocation.GISID }, // ✅ Use correct field
+                        data: { Latitude, Longitude },
+                    });
+                }
+                else {
+                    yield prisma.gISLocation.create({
+                        data: { ProjectID: projectId, Latitude, Longitude },
+                    });
+                }
             }
         }
         return updatedProject;
     }
     catch (error) {
         console.error('Error updating project:', error);
-        throw new Error('Error updating project');
+        throw new Error(error instanceof Error ? error.message : 'Error updating project');
     }
 });
 exports.updateProject = updateProject;
-// Delete a project  
+// ✅ Delete a project (including GIS location)
 const deleteProject = (projectId) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        const project = yield prisma.project.findUnique({ where: { ProjectID: projectId } });
+        if (!project)
+            throw new Error('Project not found');
+        // ✅ Delete GIS location first (if exists)
+        yield prisma.gISLocation.deleteMany({ where: { ProjectID: projectId } });
+        // ✅ Delete the project
         yield prisma.project.delete({ where: { ProjectID: projectId } });
         return { message: 'Project deleted successfully' };
     }
     catch (error) {
         console.error('Error deleting project:', error);
-        throw new Error('Error deleting project');
+        throw new Error(error instanceof Error ? error.message : 'Error deleting project');
     }
 });
 exports.deleteProject = deleteProject;
