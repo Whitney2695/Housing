@@ -1,0 +1,33 @@
+###create feedback
+POST http://localhost:3000/api/feedback
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjcxMGIyZmE1LWM3ZjUtNGUzOC05Yzg5LWUwM2MwY2ExMmQ1YyIsImVtYWlsIjoid2hpdG5leWphY2tzNjg1QGdtYWlsLmNvbSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzM4NjEwMTU3LCJleHAiOjE3Mzg2MTM3NTd9.tozK8X9yccmtQMqC6107uHxROm53RnQLEM-jO_xpHXo
+Content-Type: application/json
+
+{
+  "ProjectID": "fd8902b9-0e70-48f2-b05d-c9ffa8695319",
+  "Comments": "This project is great!",
+  "Rating": 5
+}
+
+
+###get all feedbacks for a project
+GET http://localhost:3000/api/feedback/project/{fd8902b9-0e70-48f2-b05d-c9ffa8695319}
+
+
+###update feedback
+PUT http://localhost:3000/api/feedback/{cc8b130d-fcbd-41f5-9718-6040d49d4fa1}
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjcxMGIyZmE1LWM3ZjUtNGUzOC05Yzg5LWUwM2MwY2ExMmQ1YyIsImVtYWlsIjoid2hpdG5leWphY2tzNjg1QGdtYWlsLmNvbSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzM4NjEwMTU3LCJleHAiOjE3Mzg2MTM3NTd9.tozK8X9yccmtQMqC6107uHxROm53RnQLEM-jO_xpHXo
+Content-Type: application/json
+
+{
+  "Comments": "Updated feedback",
+  "Rating": 4
+}
+
+###delete feedback
+DELETE http://localhost:3000/api/feedback/{cc8b130d-fcbd-41f5-9718-6040d49d4fa1}
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjcxMGIyZmE1LWM3ZjUtNGUzOC05Yzg5LWUwM2MwY2ExMmQ1YyIsImVtYWlsIjoid2hpdG5leWphY2tzNjg1QGdtYWlsLmNvbSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzM4NjEwMTU3LCJleHAiOjE3Mzg2MTM3NTd9.tozK8X9yccmtQMqC6107uHxROm53RnQLEM-jO_xpHXo
+
+###GET FEEDBACK BY 1D
+GET http://localhost:3000/api/feedback/{8c285064-7bd6-4d23-a77f-7695c4f6fa2f}
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjcxMGIyZmE1LWM3ZjUtNGUzOC05Yzg5LWUwM2MwY2ExMmQ1YyIsImVtYWlsIjoid2hpdG5leWphY2tzNjg1QGdtYWlsLmNvbSIsInJvbGUiOiJ1c2VyIiwiaWF0IjoxNzM4NjEwMTU3LCJleHAiOjE3Mzg2MTM3NTd9.tozK8X9yccmtQMqC6107uHxROm53RnQLEM-jO_xpHXo

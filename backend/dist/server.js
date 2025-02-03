@@ -12,6 +12,7 @@ const authRoutes_1 = __importDefault(require("./Routes/authRoutes"));
 const developerRoutes_1 = __importDefault(require("./Routes/developerRoutes"));
 const projectRoutes_1 = __importDefault(require("./Routes/projectRoutes"));
 const mortgageRoutes_1 = __importDefault(require("./Routes/mortgageRoutes"));
+const feedbackRoutes_1 = __importDefault(require("./Routes/feedbackRoutes"));
 const path_1 = __importDefault(require("path"));
 const http_1 = __importDefault(require("http"));
 const app = (0, express_1.default)();
@@ -28,6 +29,7 @@ app.use('/api/auth', authRoutes_1.default);
 app.use('/api/developers', developerRoutes_1.default);
 app.use('/api', projectRoutes_1.default);
 app.use('/api/mortgages', mortgageRoutes_1.default);
+app.use('/api/feedback', feedbackRoutes_1.default);
 app.get('/', (req, res) => {
     res.send('Welcome to the API');
 });

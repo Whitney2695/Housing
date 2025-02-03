@@ -6,6 +6,7 @@ import authRoutes from './Routes/authRoutes';
 import developerRoutes from './Routes/developerRoutes';
 import projectRoutes from './Routes/projectRoutes';
 import mortgageRoutes from './Routes/mortgageRoutes';
+import feedbackRoutes from './Routes/feedbackRoutes';
 import path from 'path';
 import http from 'http';
 
@@ -27,7 +28,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/developers', developerRoutes);
 app.use('/api', projectRoutes);
 app.use('/api/mortgages', mortgageRoutes);
-
+app.use('/api/feedback', feedbackRoutes);
 
 app.get('/', (req: Request, res: Response) => {
     res.send('Welcome to the API');
