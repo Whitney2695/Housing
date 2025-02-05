@@ -35,65 +35,134 @@ header nav ul li a {
     font-size: 18px;
 }
 
-.cta-btn {
-    background-color: #00b300;
-    color: white;
-    padding: 12px 25px;
-    text-decoration: none;
-    font-size: 16px;
-    border-radius: 5px;
-}
+
 
 .cta-btn.secondary {
     background-color: #007acc;
 }
 
+/* ================= WELCOME SECTION STYLES ================= */
 .welcome {
+    background-color: #f0f7ff;
+    padding: 60px 10%;
     display: flex;
     justify-content: space-between;
-    padding: 40px;
-    background-color: #f4f4f4;
-    min-height: 80vh; /* Ensures the section covers the full height of the viewport */
-    align-items: center; /* Vertically centers the content */
+    align-items: center;
+    gap: 50px;
 }
 
-
+/* Left Text Content */
 .welcome-content {
-    width: 45%;
+    max-width: 45%;
 }
 
-.welcome-content h2 {
-    font-size: 32px;
-    font-family: 'Georgia', serif;
+.welcome-content h1 {
+    font-size: 38px;
+    font-weight: bold;
+    color: #003366;
+    margin-bottom: 10px;
 }
 
 .welcome-content p {
     font-size: 18px;
+    color: #444;
     margin-bottom: 20px;
-    font-family: 'Verdana', sans-serif;
+    line-height: 1.5;
 }
 
-.buttons a {
-    margin-right: 20px;
+.buttons {
+    margin-top: 20px;
 }
 
-.slideshow {
-    width: 45%;
-    display: flex;
-    justify-content: space-between;
-}
-
-.slideshow img {
-    width: 32%;
+.cta-btn {
+    background-color: #003366;
+    color: white;
+    padding: 12px 25px;
+    text-decoration: none;
+    font-size: 18px;
     border-radius: 5px;
+    display: inline-block;
 }
+
+.cta-btn:hover {
+    background-color: #002855;
+}
+
+/* Stats Section */
+.stats {
+    display: flex;
+    gap: 30px;
+    margin-top: 20px;
+}
+
+.stats div {
+    text-align: center;
+    font-size: 16px;
+    font-weight: bold;
+    color: #003366;
+}
+
+/* Right Side Image */
+.welcome-image {
+    position: relative;
+    width: 100%;
+    max-width: 600px; /* Image size */
+    height: 400px; /* Fixed height */
+    overflow: hidden; /* Prevents image overflow */
+    border-radius: 15px; /* Rounded corners */
+    box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.2); /* Soft shadow for depth */
+}
+
+.welcome-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Ensures the image covers the container */
+    border-radius: 15px; /* Rounded corners */
+    transition: transform 0.3s ease-in-out, filter 0.3s ease-in-out; /* Smooth transition for hover effects */
+}
+
+/* ================= SEARCH BAR ================= */
+.search-bar {
+    background: white;
+    padding: 15px;
+    border-radius: 10px;
+    display: flex;
+    gap: 10px;
+    margin: -20px auto 50px;
+    width: 80%;
+    max-width: 1000px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    
+}
+
+.search-bar input,
+.search-bar select,
+.search-bar button {
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+.search-bar button {
+    background-color: #003366;
+    color: white;
+    cursor: pointer;
+    border: none;
+}
+
+.search-bar button:hover {
+    background-color: #002855;
+}
+
 
 .how-it-works {
     display: flex;
     flex-direction: column;
     padding: 50px 20px;
-    background-color: #f4f4f4;
+    background-color: #f0f7ff;
     text-align: center;
+    padding-top: 5px;
 }
 
 .steps {
@@ -111,7 +180,8 @@ header nav ul li a {
     flex-direction: row;
     text-align: center;
     align-items: center;
-    justify-content: space-between; /* Ensures image and description are properly spaced */
+    justify-content: space-between; 
+    
  
 }
 
@@ -178,7 +248,7 @@ header nav ul li a {
 .project-card {
     width: calc(100% / 6 - 20px); /* Show 6 cards per row */
     padding: 20px;
-    background-color: #f4f4f4;
+    background-color: #f0f7ff;
     margin-bottom: 20px;
     text-align: center;
     border-radius: 5px;

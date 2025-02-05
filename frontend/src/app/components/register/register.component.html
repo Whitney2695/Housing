@@ -1,0 +1,33 @@
+<app-navbar></app-navbar>
+<section class="auth-form">
+    <h2>Register</h2>
+    <form (submit)="onRegisterSubmit()" #registerForm="ngForm">
+        <div class="input-group">
+            <label for="fullName">Full Name</label>
+            <input type="text" id="fullName" name="fullName" ngModel required placeholder="Enter your full name" />
+        </div>
+
+        <div class="input-group">
+            <label for="email">Email Address</label>
+            <input type="email" id="email" name="email" ngModel required placeholder="Enter your email" />
+        </div>
+
+        <div class="input-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" name="password" ngModel required placeholder="Enter your password" />
+        </div>
+
+        <div class="input-group">
+            <label for="confirmPassword">Confirm Password</label>
+            <input type="password" id="confirmPassword" name="confirmPassword" ngModel required placeholder="Confirm your password" />
+        </div>
+
+        <div class="buttons">
+            <button type="submit" class="cta-btn">Register</button>
+        </div>
+
+        <div class="login-link">
+            <p>Already have an account? <a routerLink="/login">Login Here</a></p>
+        </div>
+    </form>
+</section>

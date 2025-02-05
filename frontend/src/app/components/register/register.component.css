@@ -1,0 +1,71 @@
+/* Authentication Form Styles */
+.auth-form {
+    max-width: 500px;
+    margin: 50px auto;
+    padding: 20px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.auth-form h2 {
+    font-size: 24px;
+    color: #003366;
+    margin-bottom: 30px;
+}
+
+.input-group {
+    margin-bottom: 20px;
+    text-align: left;
+    width: 90%;
+}
+
+.input-group label {
+    font-size: 16px;
+    color: #003366;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 16px;
+}
+
+.buttons {
+    margin-top: 20px;
+}
+
+.cta-btn {
+    background-color: #003366;
+    color: white;
+    padding: 12px 25px;
+    text-decoration: none;
+    font-size: 16px;
+    border-radius: 5px;
+    display: inline-block;
+    width: 70%;
+}
+
+.cta-btn:hover {
+    background-color: #002855;
+}
+
+.signup-link {
+    margin-top: 20px;
+    font-size: 14px;
+    color: #444;
+}
+
+.signup-link a {
+    color: #007acc;
+    text-decoration: none;
+}
+
+.signup-link a:hover {
+    text-decoration: underline;
+}
