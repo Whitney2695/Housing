@@ -55,17 +55,22 @@
     background-color: #002855;
 }
 
-.signup-link {
+.login-link {
     margin-top: 20px;
     font-size: 14px;
     color: #444;
 }
 
-.signup-link a {
+.login-link a {
     color: #007acc;
     text-decoration: none;
 }
 
-.signup-link a:hover {
+.login-link a:hover {
     text-decoration: underline;
+}
+
+.error {
+    color: red;
+    font-size: 12px;
 }

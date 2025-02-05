@@ -1,29 +1,95 @@
 <app-navbar></app-navbar>
+
 <section class="auth-form">
     <h2>Register</h2>
-    <form (submit)="onRegisterSubmit()" #registerForm="ngForm">
+    <form #registerForm="ngForm" (ngSubmit)="onRegisterSubmit(registerForm)">
+        <!-- Full Name Input -->
         <div class="input-group">
             <label for="fullName">Full Name</label>
-            <input type="text" id="fullName" name="fullName" ngModel required placeholder="Enter your full name" />
+            <input 
+                type="text" 
+                id="fullName" 
+                name="fullName" 
+                ngModel
+                #fullName="ngModel"
+                required
+                minlength="3"
+                placeholder="Enter your full name" 
+            />
+            <div class="error" *ngIf="fullName.invalid && fullName.touched">
+                <small *ngIf="fullName.errors?.['required']">Full Name is required.</small>
+                <small *ngIf="fullName.errors?.['minlength']">Name must be at least 3 characters long.</small>
+            </div>
         </div>
 
+        <!-- Email Input -->
         <div class="input-group">
             <label for="email">Email Address</label>
-            <input type="email" id="email" name="email" ngModel required placeholder="Enter your email" />
+            <input 
+                type="email" 
+                id="email" 
+                name="email" 
+                ngModel
+                #email="ngModel"
+                required
+                email
+                placeholder="Enter your email" 
+            />
+            <div class="error" *ngIf="email.invalid && email.touched">
+                <small *ngIf="email.errors?.['required']">Email is required.</small>
+                <small *ngIf="email.errors?.['email']">Enter a valid email address.</small>
+            </div>
         </div>
 
+        <!-- Password Input -->
         <div class="input-group">
             <label for="password">Password</label>
-            <input type="password" id="password" name="password" ngModel required placeholder="Enter your password" />
+            <input 
+                type="password" 
+                id="password" 
+                name="password" 
+                ngModel
+                #password="ngModel"
+                required
+                minlength="6"
+                placeholder="Enter your password" 
+            />
+            <div class="error" *ngIf="password.invalid && password.touched">
+                <small *ngIf="password.errors?.['required']">Password is required.</small>
+                <small *ngIf="password.errors?.['minlength']">
+                    Password must be at least 6 characters long.
+                </small>
+            </div>
         </div>
 
+        <!-- Confirm Password Input -->
         <div class="input-group">
             <label for="confirmPassword">Confirm Password</label>
-            <input type="password" id="confirmPassword" name="confirmPassword" ngModel required placeholder="Confirm your password" />
+            <input 
+                type="password" 
+                id="confirmPassword" 
+                name="confirmPassword" 
+                ngModel
+                #confirmPassword="ngModel"
+                required
+                placeholder="Confirm your password" 
+            />
+            <div class="error" *ngIf="confirmPassword.invalid && confirmPassword.touched">
+                <small *ngIf="confirmPassword.errors?.['required']">Confirm Password is required.</small>
+                <small *ngIf="password.value !== confirmPassword.value && confirmPassword.touched">
+                    Passwords do not match.
+                </small>
+            </div>
         </div>
 
+        <!-- Success Message -->
+        <div class="success-message" *ngIf="successMessage">
+            {{ successMessage }}
+        </div>
+
+        <!-- Submit Button -->
         <div class="buttons">
-            <button type="submit" class="cta-btn">Register</button>
+            <button type="submit" class="cta-btn" [disabled]="registerForm.invalid || password.value !== confirmPassword.value">Register</button>
         </div>
 
         <div class="login-link">

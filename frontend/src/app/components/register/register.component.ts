@@ -1,32 +1,30 @@
 import { Component } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, NgForm } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { NavbarComponent } from '../navbar/navbar.component';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-register',
-  imports: [RouterLink, FormsModule, NavbarComponent],
+  standalone: true,
+  imports: [RouterLink, FormsModule, NavbarComponent, CommonModule],
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.css']
 })
 export class RegisterComponent {
-  fullName: string = '';
-  email: string = '';
-  password: string = '';
-  successMessage: string = ''; // Success message variable
+  successMessage: string = '';
 
-  onRegisterSubmit(): void {
-    // For now, we simulate successful registration
-    console.log('Registration Attempted');
-    console.log('Full Name:', this.fullName);
-    console.log('Email:', this.email);
-    console.log('Password:', this.password);
+  onRegisterSubmit(registerForm: NgForm): void {
+    if (!registerForm.valid) {
+      return;
+    }
 
-    // Displaying a success message
+    const formData = registerForm.value;
+    console.log('Registration Attempted', formData);
+
     this.successMessage = 'Registration Successful!';
+    
     // Reset form fields after success
-    this.fullName = '';
-    this.email = '';
-    this.password = '';
+    registerForm.reset();
   }
 }

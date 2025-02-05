@@ -11,7 +11,7 @@ body {
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    padding-top: 60px; /* Ensures navbar is not covered */
+    padding-top: 60px; 
 }
 
 /* Tint effect behind the form */
@@ -26,7 +26,6 @@ body {
     z-index: -1;
 }
 
-/* Keep original form styles */
 .auth-form {
     max-width: 500px;
     padding: 20px;
@@ -104,5 +103,27 @@ body {
 }
 
 .signup-link a:hover {
+    text-decoration: underline;
+}
+
+.error {
+    color: red;
+    font-size: 14px;
+    margin-top: 5px;
+}
+
+.forgot-password{
+    margin-top: 20px;
+    font-size: 14px;
+    color: #444;
+    text-align: left;
+}
+
+.forgot-password a {
+    color: #007acc;
+    text-decoration: none;
+}
+
+.forgot-password a:hover {
     text-decoration: underline;
 }
