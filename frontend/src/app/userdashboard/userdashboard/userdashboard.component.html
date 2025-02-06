@@ -1,1 +1,28 @@
-<p>userdashboard works!</p>
+<app-navbar></app-navbar>
+
+<div class="dashboard-container">
+    <!-- Search Bar -->
+    <div class="search-bar">
+        <input type="text" [(ngModel)]="searchQuery" placeholder="Search by amount, location, price..." />
+    </div>
+
+    <!-- User Profile -->
+    <div class="user-profile" (click)="toggleUserMenu()">
+        <img src="https://source.unsplash.com/50x50/?person" alt="User" />
+        <div class="dropdown-menu" *ngIf="userMenuOpen">
+            <a routerLink="/edit-profile">Edit Profile</a>
+            <a routerLink="/logout">Logout</a>
+        </div>
+    </div>
+
+    <!-- Projects -->
+    <div class="projects-grid">
+        <div class="project-card" *ngFor="let project of projects">
+            <img [src]="project.image" alt="Project Image" />
+            <h3>{{ project.name }}</h3>
+            <p>📍 {{ project.location }}</p>
+            <p>💰 Ksh {{ project.price | number }}</p>
+            <button>View Details</button>
+        </div>
+    </div>
+</div>
