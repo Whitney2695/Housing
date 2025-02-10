@@ -5,6 +5,8 @@ import { RegisterComponent } from './components/register/register.component';
 import { UserdashboardComponent} from './userdashboard/userdashboard/userdashboard.component';
 import { DeveloperdashboardComponent } from './developer/developerdashboard/developerdashboard.component';
 import { AdmindashboardComponent } from './admin/admindashboard/admindashboard.component';
+import { SidebarComponent } from './developer/sidebar/sidebar.component';
+import { ProjectsComponent } from './developer/projects/projects.component';
 
 export const routes: Routes = [
     { path: '', component: LandingPageComponent },
@@ -12,5 +14,7 @@ export const routes: Routes = [
     { path: 'register', component: RegisterComponent},
     { path: 'user', component: UserdashboardComponent},
     { path: 'developer', component: DeveloperdashboardComponent},
-    { path: 'admin', component: AdmindashboardComponent}
+    { path: 'admin', component: AdmindashboardComponent},
+    { path: 'side', component: SidebarComponent},
+    { path: 'projects', component: ProjectsComponent}
 ];

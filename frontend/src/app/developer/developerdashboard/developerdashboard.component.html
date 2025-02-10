@@ -1,1 +1,53 @@
-<p>developerdashboard works!</p>
+<app-sidebar></app-sidebar>
+
+<div class="dashboard-container">
+  <!-- Header -->
+  <div class="dashboard-header">
+    <div class="dashboard-title">
+      <h2>Hi, Developer</h2>
+      <p>Welcome to your dashboard. Manage and track housing projects here.</p>
+    </div>
+    <div class="user-profile">
+      <img src="assets/nairobi.jpg" alt="User Profile" />
+      <span>Developer Name</span>
+      <i class="fas fa-chevron-down"></i>
+    </div>
+  </div>
+
+  <!-- Overview Cards -->
+  <div class="overview-cards">
+    <div class="card">
+      <h3>10</h3>
+      <p>Total Projects</p>
+    </div>
+    <div class="card">
+      <h3>5</h3>
+      <p>Ongoing Projects</p>
+    </div>
+    <div class="card">
+      <h3>3</h3>
+      <p>Completed Projects</p>
+    </div>
+    <div class="card">
+      <h3>2</h3>
+      <p>Pending Approvals</p>
+    </div>
+  </div>
+
+  <!-- Project List -->
+  <div class="project-list">
+    <div class="project-card" *ngFor="let project of projects">
+      <img [src]="project.image" alt="Project Image" />
+      <div class="project-info">
+        <h4>{{ project.name }}</h4>
+        <p><i class="fas fa-map-marker-alt"></i> {{ project.location }}</p>
+        <p><i class="fas fa-money-bill-wave"></i> Ksh {{ project.price | number }}</p>
+        <p><i class="fas fa-tasks"></i> {{ project.status }}</p>
+      </div>
+      <div class="project-actions">
+        <button class="edit-btn"><i class="fas fa-edit"></i> Edit</button>
+        <button class="delete-btn"><i class="fas fa-trash"></i> Delete</button>
+      </div>
+    </div>
+  </div>
+</div>

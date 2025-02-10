@@ -4,16 +4,16 @@
     <!-- Search Bar -->
     <div class="search-bar">
         <input type="text" [(ngModel)]="searchQuery" (input)="filterProjects()" placeholder="Search by name, location, price..." />
-        <i class="fas fa-search"></i>
+        <i class="fas fa-search search-icon"></i>
     </div>
 
     <!-- User Profile -->
     <div class="user-profile" (click)="toggleUserMenu()">
         <img src="assets/house2.jpeg" alt="User" />
-        <i class="fas fa-user-circle"></i>
+        <i class="fas fa-chevron-down dropdown-icon"></i>
         <div class="dropdown-menu" *ngIf="userMenuOpen">
-            <a routerLink="/edit-profile">Edit Profile</a>
-            <a routerLink="/logout">Logout</a>
+            <a routerLink="/edit-profile"><i class="fas fa-user-edit"></i> Edit Profile</a>
+            <a routerLink="/"><i class="fas fa-sign-out-alt"></i> Logout</a>
         </div>
     </div>
 
@@ -22,9 +22,9 @@
         <div class="project-card" *ngFor="let project of filteredProjects">
             <img [src]="project.image" alt="Project Image" />
             <h3>{{ project.name }}</h3>
-            <p><i class="fas fa-map-marker-alt"></i>Location: {{ project.location }}</p>
-            <p><i class="fas fa-money-bill-wave"></i>Price: Ksh {{ project.price | number }}</p>
-            <button>View Details</button>
+            <p><i class="fas fa-map-marker-alt location-icon"></i><b>location:</b> {{ project.location }}</p>
+            <p><i class="fa-solid fa-sack-dollar price-icon"></i><b>price:</b> Ksh {{ project.price | number }}</p>
+            <button><i class="fas fa-info-circle"></i> View Details</button>
         </div>
     </div>
 </div>
