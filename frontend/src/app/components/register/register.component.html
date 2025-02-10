@@ -2,6 +2,17 @@
 
 <section class="auth-form">
     <h2>Register</h2>
+
+    <!-- Success and Error Messages at the Top -->
+    <div *ngIf="successMessage || errorMessage" class="message-container">
+        <div class="success-message" *ngIf="successMessage">
+            {{ successMessage }}
+        </div>
+        <div class="error-message" *ngIf="errorMessage">
+            {{ errorMessage }}
+        </div>
+    </div>
+
     <form #registerForm="ngForm" (ngSubmit)="onRegisterSubmit(registerForm)">
         <!-- Full Name Input -->
         <div class="input-group">
@@ -56,9 +67,7 @@
             />
             <div class="error" *ngIf="password.invalid && password.touched">
                 <small *ngIf="password.errors?.['required']">Password is required.</small>
-                <small *ngIf="password.errors?.['minlength']">
-                    Password must be at least 6 characters long.
-                </small>
+                <small *ngIf="password.errors?.['minlength']">Password must be at least 6 characters long.</small>
             </div>
         </div>
 
@@ -80,14 +89,6 @@
                     Passwords do not match.
                 </small>
             </div>
-        </div>
-
-        <!-- Success and Error Messages -->
-        <div class="success-message" *ngIf="successMessage">
-            {{ successMessage }}
-        </div>
-        <div class="error-message" *ngIf="errorMessage">
-            {{ errorMessage }}
         </div>
 
         <!-- Submit Button -->
