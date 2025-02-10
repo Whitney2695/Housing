@@ -15,7 +15,7 @@ export const prisma = new PrismaClient();
 
 // CORS options
 const corsOptions = {
-    origin: 'http://localhost:4200',  // Angular frontend URL
+    origin: 'http://localhost:4200',  
     credentials: true,
 };
 
