@@ -2,8 +2,10 @@ import { Request, Response } from 'express';
 import UsersService from '../services/userService';
 import { PrismaClient } from '@prisma/client';
 import { validate as validateUUID } from 'uuid';
+import multer from 'multer';
 
 const prisma = new PrismaClient();
+const upload = multer({ dest: 'uploads/' });
 
 class UsersController {
   async createUser(req: Request, res: Response) {
@@ -107,22 +109,26 @@ async resetPasswordWithCode(req: Request, res: Response) {
 }
 
 
-  async updateUser(req: Request, res: Response) {
+
+async updateUser(req: Request, res: Response) {
     try {
-      const { userID } = req.params;
-      const { name, email, role } = req.body;
+        const { userID } = req.params;
+        const { name, email, role } = req.body;
+        const profileImage = req.file?.path; // Get the uploaded file path
 
-      // Validate userID as a valid UUID
-      if (!validateUUID(userID)) {
-        return res.status(400).json({ message: 'Invalid user ID format' });
-      }
+        // Validate userID as a valid UUID
+        if (!validateUUID(userID)) {
+            return res.status(400).json({ message: 'Invalid user ID format' });
+        }
 
-      const updatedUser = await UsersService.updateUser(userID, name, email, role);
-      return res.status(200).json(updatedUser);
+        const updatedUser = await UsersService.updateUser(userID, name, email, role, profileImage);
+        return res.status(200).json(updatedUser);
     } catch (error: any) {
-      return res.status(500).json({ message: 'Error updating user', error: error.message });
+        return res.status(500).json({ message: 'Error updating user', error: error.message });
     }
-  }
+}
+
+
 
   async deleteUser(req: Request, res: Response) {
     try {

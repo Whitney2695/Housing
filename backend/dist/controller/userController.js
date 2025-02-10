@@ -15,7 +15,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const userService_1 = __importDefault(require("../services/userService"));
 const client_1 = require("@prisma/client");
 const uuid_1 = require("uuid");
+const multer_1 = __importDefault(require("multer"));
 const prisma = new client_1.PrismaClient();
+const upload = (0, multer_1.default)({ dest: 'uploads/' });
 class UsersController {
     createUser(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -124,14 +126,16 @@ class UsersController {
     }
     updateUser(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
+            var _a;
             try {
                 const { userID } = req.params;
                 const { name, email, role } = req.body;
+                const profileImage = (_a = req.file) === null || _a === void 0 ? void 0 : _a.path; // Get the uploaded file path
                 // Validate userID as a valid UUID
                 if (!(0, uuid_1.validate)(userID)) {
                     return res.status(400).json({ message: 'Invalid user ID format' });
                 }
-                const updatedUser = yield userService_1.default.updateUser(userID, name, email, role);
+                const updatedUser = yield userService_1.default.updateUser(userID, name, email, role, profileImage);
                 return res.status(200).json(updatedUser);
             }
             catch (error) {

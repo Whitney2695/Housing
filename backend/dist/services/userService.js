@@ -17,6 +17,9 @@ const client_1 = require("@prisma/client");
 const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const crypto_1 = __importDefault(require("crypto"));
 const dotenv_1 = __importDefault(require("dotenv"));
+const cloudinary_1 = __importDefault(require("../config/cloudinary"));
+const fs_1 = __importDefault(require("fs"));
+const path_1 = __importDefault(require("path"));
 // Load environment variables from .env file
 dotenv_1.default.config();
 const prisma = new client_1.PrismaClient();
@@ -127,10 +130,33 @@ class UsersService {
             return updatedUser;
         });
     }
-    // Update user details (excluding password)
-    updateUser(userID, name, email, role) {
+    updateUser(userID, name, email, role, profileImage) {
         return __awaiter(this, void 0, void 0, function* () {
             console.log(`Updating user ID: ${userID}`);
+            let imageUrl = undefined;
+            // Check if profileImage is provided (local file path)
+            if (profileImage) {
+                const imagePath = path_1.default.resolve(__dirname, '..', 'uploads', profileImage); // Ensure the 'uploads' folder exists
+                // Check if the file exists locally
+                if (!fs_1.default.existsSync(imagePath)) {
+                    console.error(`File not found: ${imagePath}`);
+                    throw new Error(`Profile image file not found`);
+                }
+                try {
+                    // Upload to Cloudinary
+                    const uploadResponse = yield cloudinary_1.default.uploader.upload(imagePath, {
+                        folder: 'user_profiles',
+                    });
+                    // Store the URL from Cloudinary
+                    imageUrl = uploadResponse.secure_url;
+                    console.log(`Profile image uploaded: ${imageUrl}`);
+                }
+                catch (error) {
+                    console.error('Error uploading profile image to Cloudinary:', error);
+                    throw new Error('Failed to upload profile image');
+                }
+            }
+            // Update user details in the database
             const updatedUser = yield prisma.user.update({
                 where: {
                     UserID: userID,
@@ -139,6 +165,7 @@ class UsersService {
                     Name: name,
                     Email: email,
                     Role: role,
+                    ProfileImageUrl: imageUrl || undefined,
                 },
             });
             console.log(`User updated: ${updatedUser.Email}`);

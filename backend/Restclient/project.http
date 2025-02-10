@@ -1,34 +1,38 @@
 ###create project
 POST http://localhost:3000/api/projects
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImY4ODZjODRiLWEzZWYtNDkyNC1hYzExLTllZmJkNGRlNjBmZiIsImVtYWlsIjoibWVsb0BleGFtcGxlLmNvbSIsInJvbGUiOiJkZXZlbG9wZXIiLCJpYXQiOjE3Mzg2MDkwMjcsImV4cCI6MTczODYxMjYyN30.HnsNImnfBrniF2URD1OBznfgElwLFCa-1YvE_X8t4Rc
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImY4ODZjODRiLWEzZWYtNDkyNC1hYzExLTllZmJkNGRlNjBmZiIsImVtYWlsIjoibWVsb0BleGFtcGxlLmNvbSIsInJvbGUiOiJkZXZlbG9wZXIiLCJpYXQiOjE3MzkyMTgxMDQsImV4cCI6MTczOTIyMTcwNH0.v0c8-2N2bKQ3cImgKk-ID9JbcjC5g5_cv0WZewnxYTk
 
 {
-  "Title": "milimani Project",
+  "Title": "Milimani Project",
   "Description": "This is another new house project.",
   "MinCreditScore": 700,
   "InterestRate": 4.8,
   "Price": 150000,
-  "EligibilityCriteria": [
-    "Minimum credit score of 700",
-    "Must be employed full-time",
-    "Must have a down payment of at least 10%",
-    "No previous bankruptcy in the last 7 years"
-  ],
+  "EligibilityCriteria": {
+    "MinimumCreditScore": 700,
+    "EmploymentStatus": "Full-time",
+    "DownPayment": "At least 10%",
+    "NoBankruptcyLast7Years": true
+  },
   "ProgressPercentage": 20,
   "Status": "InProgress",
   "StartDate": "2025-02-01T00:00:00Z",
-  "GIS_Locations": {
-    "Latitude": 34.56,
-    "Longitude": 78.90
-  },
-  "image": "assets/house2"
+  "Location": "Milimani, Nairobi", 
+  "GIS_Locations": [
+    {
+      "Latitude": 34.56,
+      "Longitude": 78.90
+    }
+  ],
+  "image": "assets/house2.jpg"
 }
+
 
 
 ### get all projects
 GET http://localhost:3000/api/projects
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImY4ODZjODRiLWEzZWYtNDkyNC1hYzExLTllZmJkNGRlNjBmZiIsImVtYWlsIjoibWVsb0BleGFtcGxlLmNvbSIsInJvbGUiOiJkZXZlbG9wZXIiLCJpYXQiOjE3Mzg2MTAyMDEsImV4cCI6MTczODYxMzgwMX0.QeRwTDRrB4vfiGSxh0lUjgV0xYyz1pD8I17rPN-TSwU
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImY4ODZjODRiLWEzZWYtNDkyNC1hYzExLTllZmJkNGRlNjBmZiIsImVtYWlsIjoibWVsb0BleGFtcGxlLmNvbSIsInJvbGUiOiJkZXZlbG9wZXIiLCJpYXQiOjE3MzkyMTgxMDQsImV4cCI6MTczOTIyMTcwNH0.v0c8-2N2bKQ3cImgKk-ID9JbcjC5g5_cv0WZewnxYTk
 
 
 ### get project by ID

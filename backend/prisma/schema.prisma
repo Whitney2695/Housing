@@ -20,6 +20,7 @@ model User {
   Password  String
   Role      UserRole   @default(user)
   CreatedAt DateTime   @default(now())
+  ProfileImageUrl    String? 
   Feedbacks Feedback[] @relation("UserFeedbacks")
   Mortgages Mortgage[] @relation("UserMortgages")
   ResetCode         String?  // Add this line
@@ -56,6 +57,7 @@ model Project {
   Price               Float? 
   ProjectImageUrl     String? 
   DeveloperID         String        @db.Uuid // Ensure this is uuid
+  Location            String? 
   StartDate           DateTime?
   CreatedAt           DateTime      @default(now())
   Developer           Developer     @relation("DeveloperProjects", fields: [DeveloperID], references: [DeveloperID])

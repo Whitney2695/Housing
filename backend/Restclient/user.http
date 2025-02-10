@@ -18,13 +18,14 @@ GET http://localhost:3000/api/users/04b6d592-e2cb-4e2e-a6dc-9ff099e54a61
 Content-Type: application/json
 
 ### Update user details (Whitney Navalia)
-PUT http://localhost:3000/api/users/0faa5f89-2bf7-4d1f-91c6-420d0919fd90
+PUT http://localhost:3000/api/users/710b2fa5-c7f5-4e38-9c89-e03c0ca12d5c
 Content-Type: application/json
 
 {
-    "name": "john doe",
+    "name": "John Doe",
     "email": "johndoe@example.com",
-    "role": "developer"
+    "role": "developer",
+    "profileImage": "assets/house.jpg"
 }
 
 ###generate code

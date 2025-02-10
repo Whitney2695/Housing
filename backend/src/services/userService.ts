@@ -3,6 +3,9 @@ import { PrismaClient, UserRole } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 import dotenv from 'dotenv';
+import cloudinary from '../config/cloudinary';
+import fs from 'fs';
+import path from 'path';
 
 // Load environment variables from .env file
 dotenv.config();
@@ -122,23 +125,55 @@ class UsersService {
     return updatedUser;
   }
 
-  // Update user details (excluding password)
-  async updateUser(userID: string, name?: string, email?: string, role?: UserRole) {
+
+
+  async updateUser(userID: string, name?: string, email?: string, role?: UserRole, profileImage?: string) {
     console.log(`Updating user ID: ${userID}`);
+
+    let imageUrl: string | undefined = undefined;
+
+    // Check if profileImage is provided (local file path)
+    if (profileImage) {
+        const imagePath = path.resolve(__dirname, '..', 'uploads', profileImage); // Ensure the 'uploads' folder exists
+
+        // Check if the file exists locally
+        if (!fs.existsSync(imagePath)) {
+            console.error(`File not found: ${imagePath}`);
+            throw new Error(`Profile image file not found`);
+        }
+
+        try {
+            // Upload to Cloudinary
+            const uploadResponse = await cloudinary.uploader.upload(imagePath, {
+                folder: 'user_profiles',
+            });
+
+            // Store the URL from Cloudinary
+            imageUrl = uploadResponse.secure_url;
+            console.log(`Profile image uploaded: ${imageUrl}`);
+        } catch (error) {
+            console.error('Error uploading profile image to Cloudinary:', error);
+            throw new Error('Failed to upload profile image');
+        }
+    }
+
+    // Update user details in the database
     const updatedUser = await prisma.user.update({
-      where: {
-        UserID: userID,
-      },
-      data: {
-        Name: name,
-        Email: email,
-        Role: role,
-      },
+        where: {
+            UserID: userID,
+        },
+        data: {
+            Name: name,
+            Email: email,
+            Role: role,
+            ProfileImageUrl: imageUrl || undefined,
+        },
     });
 
     console.log(`User updated: ${updatedUser.Email}`);
     return updatedUser;
-  }
+}
+
 
   // Delete user
   async deleteUser(userID: string) {
