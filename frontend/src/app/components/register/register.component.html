@@ -82,14 +82,19 @@
             </div>
         </div>
 
-        <!-- Success Message -->
+        <!-- Success and Error Messages -->
         <div class="success-message" *ngIf="successMessage">
             {{ successMessage }}
+        </div>
+        <div class="error-message" *ngIf="errorMessage">
+            {{ errorMessage }}
         </div>
 
         <!-- Submit Button -->
         <div class="buttons">
-            <button type="submit" class="cta-btn" [disabled]="registerForm.invalid || password.value !== confirmPassword.value">Register</button>
+            <button type="submit" class="cta-btn" [disabled]="registerForm.invalid || password.value !== confirmPassword.value">
+                Register
+            </button>
         </div>
 
         <div class="login-link">
