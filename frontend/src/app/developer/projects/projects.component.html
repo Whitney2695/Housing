@@ -116,7 +116,7 @@
 </div>
 
 <!-- Edit Project Modal -->
-<div *ngIf="editProjectData" class="modal">
+<div *ngIf="editProjectData" class="edit-modal">
   <div class="modal-content">
     <h3>Edit Project</h3>
     <form (ngSubmit)="updateProject()">
@@ -146,8 +146,11 @@
       <label>Longitude:</label>
       <input type="text" [(ngModel)]="editProjectData.Longitude" name="Longitude" required>
 
-      <button type="submit" class="save-btn">Save Changes</button>
-      <button type="button" class="close-btn" (click)="closeEditModal()">Cancel</button>
+      <div class="button-container">
+        <button type="submit" class="save-btn">Save Changes</button>
+        <button type="button" class="close-btn" (click)="closeEditModal()">Cancel</button>
+      </div>
+      
     </form>
   </div>
 </div>

@@ -399,5 +399,105 @@
     90% { opacity: 1; }
     100% { opacity: 0; }
   }
-  
-  
+    
+ /* Scoped Styles for Edit Project Modal */
+.edit-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.6);
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.edit-modal .modal-content {
+  background: #fff;
+  padding: 20px;
+  width: 60%; /* Increased width */
+  max-width: 700px; /* Limits max width */
+  max-height: 80vh; /* Prevents excessive height */
+  overflow-y: auto; /* Enables scrolling */
+  border-radius: 10px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  position: relative;
+}
+
+.edit-modal h3 {
+  text-align: center;
+  margin-bottom: 15px;
+  color: #333;
+}
+
+.edit-modal form {
+  display: flex;
+  flex-direction: column;
+}
+
+.edit-modal label {
+  font-weight: bold;
+  margin-top: 10px;
+  color: #444;
+}
+
+.edit-modal input,
+.edit-modal textarea,
+.edit-modal select {
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+.edit-modal input:focus,
+.edit-modal textarea:focus,
+.edit-modal select:focus {
+  border-color: #007bff;
+  outline: none;
+  background-color: #f9f9f9;
+}
+
+
+.edit-modal .button-container {
+  display: flex;
+  gap:15px;
+  align-items: center;
+  margin-top: 25px;
+  margin-left: 200px;
+}
+
+.edit-modal .save-btn {
+  background: #007bff;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  border: none;
+  transition: background 0.3s;
+}
+
+.edit-modal .save-btn:hover {
+  background: #0056b3;
+}
+
+.edit-modal .close-btn {
+  background: #dc3545;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  border: none;
+  transition: background 0.3s;
+}
+
+.edit-modal .close-btn:hover {
+  background: #a71d2a;
+}
