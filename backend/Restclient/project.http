@@ -1,10 +1,10 @@
 ###create project
 POST http://localhost:3000/api/projects
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImY4ODZjODRiLWEzZWYtNDkyNC1hYzExLTllZmJkNGRlNjBmZiIsImVtYWlsIjoibWVsb0BleGFtcGxlLmNvbSIsInJvbGUiOiJkZXZlbG9wZXIiLCJpYXQiOjE3MzkyMTgxMDQsImV4cCI6MTczOTIyMTcwNH0.v0c8-2N2bKQ3cImgKk-ID9JbcjC5g5_cv0WZewnxYTk
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImY4ODZjODRiLWEzZWYtNDkyNC1hYzExLTllZmJkNGRlNjBmZiIsImVtYWlsIjoibWVsb0BleGFtcGxlLmNvbSIsInJvbGUiOiJkZXZlbG9wZXIiLCJpYXQiOjE3Mzk0NTE4MjQsImV4cCI6MTczOTQ1NTQyNH0.TEfzyEMB4qoZPPdwLAziLL039R6jqg1c7VJObJ98MxA
 
 {
-  "Title": "Milimani Project",
+  "Title": "bell",
   "Description": "This is another new house project.",
   "MinCreditScore": 700,
   "InterestRate": 4.8,
@@ -28,11 +28,40 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImY4ODZjODRiL
   "image": "assets/house2.jpg"
 }
 
+###update project
+PUT http://localhost:3000/api/projects/{c8baa4f1-9948-43c9-bcd3-3412cf182959}
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImY4ODZjODRiLWEzZWYtNDkyNC1hYzExLTllZmJkNGRlNjBmZiIsImVtYWlsIjoibWVsb0BleGFtcGxlLmNvbSIsInJvbGUiOiJkZXZlbG9wZXIiLCJpYXQiOjE3Mzk0NTE4MjQsImV4cCI6MTczOTQ1NTQyNH0.TEfzyEMB4qoZPPdwLAziLL039R6jqg1c7VJObJ98MxA
+
+{
+  "Title": "Updated Project Title",
+  "Description": "Updated description",
+  "MinCreditScore": 720,
+  "InterestRate": 5.0,
+  "Price": 160000,
+  "EligibilityCriteria": {
+    "MinimumCreditScore": 720,
+    "EmploymentStatus": "Full-time",
+    "DownPayment": "At least 15%",
+    "NoBankruptcyLast7Years": true
+  },
+  "ProgressPercentage": 50,
+  "Status": "Completed",
+  "StartDate": "2025-03-01T00:00:00Z",
+  "Location": "Westlands, Nairobi",
+  "GIS_Locations": [
+    {
+      "Latitude": 36.78,
+      "Longitude": 75.90
+    }
+  ],
+  "image": "assets/updated-house.jpg"
+}
 
 
 ### get all projects
 GET http://localhost:3000/api/projects
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImY4ODZjODRiLWEzZWYtNDkyNC1hYzExLTllZmJkNGRlNjBmZiIsImVtYWlsIjoibWVsb0BleGFtcGxlLmNvbSIsInJvbGUiOiJkZXZlbG9wZXIiLCJpYXQiOjE3MzkyMTgxMDQsImV4cCI6MTczOTIyMTcwNH0.v0c8-2N2bKQ3cImgKk-ID9JbcjC5g5_cv0WZewnxYTk
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImY4ODZjODRiLWEzZWYtNDkyNC1hYzExLTllZmJkNGRlNjBmZiIsImVtYWlsIjoibWVsb0BleGFtcGxlLmNvbSIsInJvbGUiOiJkZXZlbG9wZXIiLCJpYXQiOjE3Mzk0NTE4MjQsImV4cCI6MTczOTQ1NTQyNH0.TEfzyEMB4qoZPPdwLAziLL039R6jqg1c7VJObJ98MxA
 
 
 ### get project by ID

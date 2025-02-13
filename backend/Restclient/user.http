@@ -48,5 +48,5 @@ Content-Type: application/json
 }
 
 ### Delete user (Whitney Navalia)
-DELETE http://localhost:3000/api/users/577b51b9-808f-44c3-8888-91bb1a7696bc
+DELETE http://localhost:3000/api/users/5419f411-754e-4c32-a4c5-769ecbece816
 Content-Type: application/json

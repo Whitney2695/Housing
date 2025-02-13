@@ -20,10 +20,12 @@ cloudinary_1.v2.config({
 });
 const uploadImageToCloudinary = (file) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        console.log('Uploading image to Cloudinary...');
         const result = yield cloudinary_1.v2.uploader.upload(file.path, {
             folder: 'projects',
             resource_type: 'image',
         });
+        console.log('Image uploaded successfully:', result.secure_url);
         return result.secure_url;
     }
     catch (error) {
@@ -35,26 +37,33 @@ const uploadImageToCloudinary = (file) => __awaiter(void 0, void 0, void 0, func
 const createProject = (req) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     try {
+        console.log('Creating a new project with data:', req.body);
         const { Title, Description, MinCreditScore, InterestRate, EligibilityCriteria, ProgressPercentage, Status, StartDate, Price, Location, GIS_Locations } = req.body;
         if (!((_a = req.user) === null || _a === void 0 ? void 0 : _a.id))
             throw new Error('Unauthorized: No User ID found in token');
+        console.log('User ID:', req.user.id);
         const user = yield prisma.user.findUnique({ where: { UserID: req.user.id } });
         if (!user)
             throw new Error('User does not exist');
         const developer = yield prisma.developer.findUnique({ where: { UserID: req.user.id } });
         if (!developer)
             throw new Error('Developer not found for the provided User ID');
-        // ✅ Check if a project with the same title exists
+        console.log('Developer found:', developer.DeveloperID);
+        // Case-insensitive check for duplicate project title
         const existingProject = yield prisma.project.findFirst({
-            where: { Title, DeveloperID: developer.DeveloperID },
+            where: {
+                Title: { equals: Title, mode: 'insensitive' },
+                DeveloperID: developer.DeveloperID,
+            },
         });
         if (existingProject)
             throw new Error('A project with this title already exists');
-        // ✅ Upload image to Cloudinary (if provided)
         let imageUrl = null;
-        if (req.file)
+        if (req.file) {
+            console.log('Uploading project image...');
             imageUrl = yield uploadImageToCloudinary(req.file);
-        // ✅ Create the project
+        }
+        console.log('Saving new project to database...');
         const newProject = yield prisma.project.create({
             data: {
                 Title,
@@ -66,21 +75,19 @@ const createProject = (req) => __awaiter(void 0, void 0, void 0, function* () {
                 Status,
                 StartDate,
                 Price,
-                Location, // 🔹 Store location separately
+                Location,
                 ProjectImageUrl: imageUrl,
                 DeveloperID: developer.DeveloperID,
-            },
-        });
-        // ✅ Insert GIS location if provided
-        if ((GIS_Locations === null || GIS_Locations === void 0 ? void 0 : GIS_Locations.Latitude) && (GIS_Locations === null || GIS_Locations === void 0 ? void 0 : GIS_Locations.Longitude)) {
-            yield prisma.gISLocation.create({
-                data: {
-                    ProjectID: newProject.ProjectID,
-                    Latitude: GIS_Locations.Latitude,
-                    Longitude: GIS_Locations.Longitude,
+                GIS_Locations: {
+                    create: (GIS_Locations === null || GIS_Locations === void 0 ? void 0 : GIS_Locations.map((loc) => ({
+                        Latitude: loc.Latitude,
+                        Longitude: loc.Longitude,
+                    }))) || [],
                 },
-            });
-        }
+            },
+            include: { GIS_Locations: true },
+        });
+        console.log('Project created successfully:', newProject);
         return newProject;
     }
     catch (error) {
@@ -92,9 +99,10 @@ exports.createProject = createProject;
 // ✅ Get all projects
 const getProjects = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        return yield prisma.project.findMany({
-            include: { GIS_Locations: true },
-        });
+        console.log('Fetching all projects...');
+        const projects = yield prisma.project.findMany({ include: { GIS_Locations: true } });
+        console.log('Projects fetched successfully:', projects);
+        return projects;
     }
     catch (error) {
         console.error('Error fetching projects:', error);
@@ -105,12 +113,14 @@ exports.getProjects = getProjects;
 // ✅ Get a project by ID
 const getProjectById = (projectId) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        console.log('Fetching project with ID:', projectId);
         const project = yield prisma.project.findUnique({
             where: { ProjectID: projectId },
             include: { GIS_Locations: true },
         });
         if (!project)
             throw new Error('Project not found');
+        console.log('Project fetched successfully:', project);
         return project;
     }
     catch (error) {
@@ -119,34 +129,32 @@ const getProjectById = (projectId) => __awaiter(void 0, void 0, void 0, function
     }
 });
 exports.getProjectById = getProjectById;
-// ✅ Update project
+// ✅ Update a project
 const updateProject = (projectId, data, file) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a, _b;
+    var _a;
     try {
+        console.log('Updating project with ID:', projectId);
         const existingProject = yield prisma.project.findUnique({ where: { ProjectID: projectId } });
         if (!existingProject)
             throw new Error('Project not found');
         let imageUrl = existingProject.ProjectImageUrl;
-        if (file)
+        if (file) {
+            console.log('Uploading new project image...');
             imageUrl = (yield uploadImageToCloudinary(file)) || imageUrl;
+        }
+        console.log('Updating project in database...');
         const updatedProject = yield prisma.project.update({
             where: { ProjectID: projectId },
-            data: Object.assign(Object.assign({}, data), { ProjectImageUrl: imageUrl }),
+            data: Object.assign(Object.assign({}, data), { ProjectImageUrl: imageUrl, GIS_Locations: {
+                    deleteMany: {}, // Clear old locations before updating
+                    create: ((_a = data.GIS_Locations) === null || _a === void 0 ? void 0 : _a.map((loc) => ({
+                        Latitude: loc.Latitude,
+                        Longitude: loc.Longitude,
+                    }))) || [],
+                } }),
+            include: { GIS_Locations: true },
         });
-        if (((_a = data.GIS_Locations) === null || _a === void 0 ? void 0 : _a.Latitude) && ((_b = data.GIS_Locations) === null || _b === void 0 ? void 0 : _b.Longitude)) {
-            const existingLocation = yield prisma.gISLocation.findFirst({ where: { ProjectID: projectId } });
-            if (existingLocation) {
-                yield prisma.gISLocation.update({
-                    where: { GISID: existingLocation.GISID },
-                    data: { Latitude: data.GIS_Locations.Latitude, Longitude: data.GIS_Locations.Longitude },
-                });
-            }
-            else {
-                yield prisma.gISLocation.create({
-                    data: { ProjectID: projectId, Latitude: data.GIS_Locations.Latitude, Longitude: data.GIS_Locations.Longitude },
-                });
-            }
-        }
+        console.log('Project updated successfully:', updatedProject);
         return updatedProject;
     }
     catch (error) {
@@ -158,8 +166,10 @@ exports.updateProject = updateProject;
 // ✅ Delete project
 const deleteProject = (projectId) => __awaiter(void 0, void 0, void 0, function* () {
     try {
+        console.log('Deleting project with ID:', projectId);
         yield prisma.gISLocation.deleteMany({ where: { ProjectID: projectId } });
         yield prisma.project.delete({ where: { ProjectID: projectId } });
+        console.log('Project deleted successfully');
         return { message: 'Project deleted successfully' };
     }
     catch (error) {
