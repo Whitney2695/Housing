@@ -1,7 +1,13 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SidebarComponent } from '../sidebar/sidebar.component';
+import { ProjectService } from '../../services/project.service';
+
+interface GISLocation {
+  Latitude: number;
+  Longitude: number;
+}
 
 @Component({
   selector: 'app-projects',
@@ -10,48 +16,52 @@ import { SidebarComponent } from '../sidebar/sidebar.component';
   templateUrl: './projects.component.html',
   styleUrls: ['./projects.component.css']
 })
-export class ProjectsComponent {
-  projects = [
-    {
-      ProjectID: '1',
-      Title: 'Sunrise Apartments',
-      Description: 'Modern and affordable apartments in Nairobi.',
-      Status: 'Ongoing',
-      ProgressPercentage: 60,
-      EligibilityCriteria: { income: 'Above Ksh 50,000', employment: 'Permanent' },
-      MinCreditScore: 650,
-      InterestRate: 5.5,
-      Price: 4500000,
-      ProjectImageUrl: 'assets/sunrise.jpg',
-      DeveloperID: 'dev-123',
-      StartDate: new Date('2024-03-01'),
-      CreatedAt: new Date(),
-      Location: 'Nairobi, Kenya',
-      GISLocation: { lat: -1.286389, lng: 36.817223 }
-    },
-    {
-      ProjectID: '2',
-      Title: 'Greenwood Villas',
-      Description: 'Luxury villas in Mombasa with a beachfront view.',
-      Status: 'Completed',
-      ProgressPercentage: 100,
-      EligibilityCriteria: { income: 'Above Ksh 80,000', employment: 'Business Owner' },
-      MinCreditScore: 700,
-      InterestRate: 6.0,
-      Price: 5500000,
-      ProjectImageUrl: 'assets/greenwood.jpg',
-      DeveloperID: 'dev-124',
-      StartDate: new Date('2023-06-01'),
-      CreatedAt: new Date(),
-      Location: 'Mombasa, Kenya',
-      GISLocation: { lat: -4.043477, lng: 39.668206 }
-    }
-  ];
-
+export class ProjectsComponent implements OnInit {
+  projects: any[] = [];
   selectedProject: any = null;
   editProjectData: any = null;
   deleteProjectData: any = null;
   successMessage: string = '';
+  showAddModal = false;
+  newProject: any = {
+    Title: '',
+    Description: '',
+    Status: 'Planned',
+    ProgressPercentage: 0,
+    EligibilityCriteria: { income: '', employment: '' },
+    MinCreditScore: null,
+    InterestRate: null,
+    Price: null,
+    ProjectImageUrl: '', // ✅ Fixed Property Name
+    DeveloperID: '', // ✅ Ensured DeveloperID is always included
+    StartDate: new Date().toISOString(),
+    CreatedAt: new Date().toISOString(),
+    Location: '',
+    GIS_Locations: [] as GISLocation[] // ✅ Ensured GIS_Locations is an array of GISLocation
+  };
+  selectedFile: File | null = null;
+
+  constructor(private projectService: ProjectService) {}
+
+  ngOnInit() {
+    this.loadProjects();
+  }
+
+  loadProjects() {
+    this.projectService.getProjects().subscribe(
+      (data: any) => {
+        this.projects = data.map((project: any) => ({
+          ...project,
+          DeveloperID: project.DeveloperID ?? '',
+          GIS_Locations: Array.isArray(project.GIS_Locations) ? project.GIS_Locations : [] // ✅ Ensure it's always an array
+        }));
+      },
+      (error: any) => {
+        console.error('Error fetching projects', error);
+      }
+    );
+  }
+  
 
   openViewModal(project: any) {
     this.selectedProject = project;
@@ -70,9 +80,20 @@ export class ProjectsComponent {
   }
 
   updateProject() {
-    this.projects = this.projects.map(p => (p.ProjectID === this.editProjectData.ProjectID ? this.editProjectData : p));
-    this.closeEditModal();
-    this.showSuccessMessage('Project updated successfully!');
+    if (this.editProjectData) {
+      this.projectService.updateProject(
+        this.editProjectData.ProjectID,
+        this.editProjectData,
+        this.selectedFile || undefined
+      ).subscribe(
+        () => {
+          this.loadProjects();
+          this.closeEditModal();
+          this.showSuccessMessage('Project updated successfully!');
+        },
+        (error: any) => console.error('Error updating project', error)
+      );
+    }
   }
 
   openDeleteModal(project: any) {
@@ -84,32 +105,38 @@ export class ProjectsComponent {
   }
 
   confirmDelete() {
-    this.projects = this.projects.filter(p => p.ProjectID !== this.deleteProjectData.ProjectID);
-    this.closeDeleteModal();
-    this.showSuccessMessage('Project deleted successfully!');
+    if (this.deleteProjectData) {
+      this.projectService.deleteProject(this.deleteProjectData.ProjectID).subscribe(
+        () => {
+          this.projects = this.projects.filter(p => p.ProjectID !== this.deleteProjectData.ProjectID);
+          this.closeDeleteModal();
+          this.showSuccessMessage('Project deleted successfully!');
+        },
+        (error: any) => console.error('Error deleting project', error)
+      );
+    }
   }
-
-  showAddModal = false;
-  newProject: any = {
-    Title: '',
-    Description: '',
-    Status: 'Planned',
-    ProgressPercentage: 0,
-    EligibilityCriteria: { income: '', employment: '' },
-    MinCreditScore: null,
-    InterestRate: null,
-    Price: null,
-    ProjectImageUrl: '',
-    DeveloperID: '',
-    StartDate: new Date(),
-    CreatedAt: new Date(),
-    Location: '',
-    GISLocation: { lat: null, lng: null }
-  };
 
   openAddModal() {
+    this.newProject = {
+      Title: '',
+      Description: '',
+      Status: 'Planned',
+      ProgressPercentage: 0,
+      EligibilityCriteria: { income: '', employment: '' },
+      MinCreditScore: null,
+      InterestRate: null,
+      Price: null,
+      ProjectImageUrl: '',
+      DeveloperID: '',
+      StartDate: new Date().toISOString(),
+      CreatedAt: new Date().toISOString(),
+      Location: '',
+      GIS_Locations: [{ Latitude: null, Longitude: null }] // ✅ Fix: Initialize with an object
+    };
     this.showAddModal = true;
   }
+  
 
   closeAddModal() {
     this.showAddModal = false;
@@ -126,21 +153,32 @@ export class ProjectsComponent {
       MinCreditScore: null,
       InterestRate: null,
       Price: null,
-      ProjectImageUrl: '',
-      DeveloperID: '',
-      StartDate: new Date(),
-      CreatedAt: new Date(),
+      ProjectImageUrl: '', // ✅ Correct Property Name
+      DeveloperID: '', // ✅ Ensure DeveloperID is always included
+      StartDate: new Date().toISOString(),
+      CreatedAt: new Date().toISOString(),
       Location: '',
-      GISLocation: { lat: null, lng: null }
+      GIS_Locations: [] as GISLocation[] // ✅ Ensured GIS_Locations is an array of GISLocation
     };
   }
 
+  onFileSelected(event: any) {
+    this.selectedFile = event.target.files[0] || null;
+  }
+
   addProject() {
-    const newId = (this.projects.length + 1).toString();
-    const projectToAdd = { ...this.newProject, ProjectID: newId };
-    this.projects.push(projectToAdd);
-    this.closeAddModal();
-    this.showSuccessMessage('Project added successfully!');
+    this.projectService.createProject(this.newProject, this.selectedFile || undefined).subscribe(
+      (response: any) => {
+        this.projects.push({
+          ...response,
+          DeveloperID: response.DeveloperID ?? '', // ✅ Ensure DeveloperID is included
+          GIS_Locations: response.GIS_Locations ?? [] as GISLocation[] // ✅ Prevents GIS_Locations type errors
+        });
+        this.closeAddModal();
+        this.showSuccessMessage('Project added successfully!');
+      },
+      (error: any) => console.error('Error adding project', error)
+    );
   }
 
   showSuccessMessage(message: string) {
@@ -148,16 +186,5 @@ export class ProjectsComponent {
     setTimeout(() => {
       this.successMessage = '';
     }, 3000);
-  }
-
-  onFileSelected(event: any) {
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (e: any) => {
-        this.newProject.ProjectImage = e.target.result; // Convert file to base64
-      };
-      reader.readAsDataURL(file);
-    }
   }
 }
