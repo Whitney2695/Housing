@@ -55,16 +55,21 @@
         <!-- Password Input -->
         <div class="input-group">
             <label for="password">Password</label>
-            <input 
-                type="password" 
-                id="password" 
-                name="password" 
-                ngModel
-                #password="ngModel"
-                required
-                minlength="6"
-                placeholder="Enter your password" 
-            />
+            <div class="password-wrapper">
+                <input 
+                    [type]="showPassword ? 'text' : 'password'" 
+                    id="password" 
+                    name="password" 
+                    ngModel
+                    #password="ngModel"
+                    required
+                    minlength="6"
+                    placeholder="Enter your password" 
+                />
+                <span (click)="togglePasswordVisibility('password')" class="toggle-eye">
+                    <i class="fas" [ngClass]="{'fa-eye-slash': showPassword, 'fa-eye': !showPassword}"></i>
+                </span>
+            </div>
             <div class="error" *ngIf="password.invalid && password.touched">
                 <small *ngIf="password.errors?.['required']">Password is required.</small>
                 <small *ngIf="password.errors?.['minlength']">Password must be at least 6 characters long.</small>
@@ -74,16 +79,21 @@
         <!-- Confirm Password Input -->
         <div class="input-group">
             <label for="confirmPassword">Confirm Password</label>
-            <input 
-                type="password" 
-                id="confirmPassword" 
-                name="confirmPassword" 
-                ngModel
-                #confirmPassword="ngModel"
-                required
-                placeholder="Confirm your password" 
-            />
-            <div class="error" *ngIf="confirmPassword.invalid && confirmPassword.touched">
+            <div class="password-wrapper">
+                <input 
+                    [type]="showConfirmPassword ? 'text' : 'password'" 
+                    id="confirmPassword" 
+                    name="confirmPassword" 
+                    ngModel
+                    #confirmPassword="ngModel"
+                    required
+                    placeholder="Confirm your password" 
+                />
+                <span (click)="togglePasswordVisibility('confirmPassword')" class="toggle-eye">
+                    <i class="fas" [ngClass]="{'fa-eye-slash': showConfirmPassword, 'fa-eye': !showConfirmPassword}"></i>
+                </span>
+            </div>
+            <div class="error" *ngIf="confirmPassword.invalid && confirmPassword.touched || password.value !== confirmPassword.value">
                 <small *ngIf="confirmPassword.errors?.['required']">Confirm Password is required.</small>
                 <small *ngIf="password.value !== confirmPassword.value && confirmPassword.touched">
                     Passwords do not match.
